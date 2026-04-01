@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Brian Jing</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Manrope:wght@200..800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    /* Every element + pseudo-elements (::before, ::after) */
+    /* pseudo elements are created by the browser (not actually in the DOM) */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ^^ generated before/after element content */
+    
+    /* CSS root pseudo-class selector (:root) */
+    /* one colon (:) is whole element (pseudo-class), multiple colons (::) is part of an element (pseudo-element) */
+    :root {
+      --sky-top:    #74b4d8;
+      --sky-bot:    #b8daf0;
+      --water-surface: #4f9fc0;
+      /* Hero ↔ main water seam: light cap that matches .water-surface-hero / .water-bg feather */
+      --hero-water-bridge: #5cb0d0;
+      /* Shallow hero water between sky-bot and bridge */
+      --hero-shallow-water: #8cc4dc;
+      --water-top:  #2e7a9e;
+      --water-mid:  #1a506e;
+      --water-deep: #0e2f45;
+      --water-abyss:#091c2a;
+      --sand-dark:  #7a5e30;
+      --cloud:      #cce0ef;
+      --text-sky:   #0e2233;
+      --text-water: #e0f2ff;
+      --foam: rgba(226, 246, 255, 0.72);
+      --foam-soft: rgba(226, 246, 255, 0.36);
+    }
+    
+    /* CSS type selectors */
+    html {
+      scroll-behavior: smooth;
+      /* Prevent horizontal rubber-band/overflow and keep edge color consistent. */
+      overflow-x: clip;
+      background: linear-gradient(
+        180deg,
+        var(--sky-top) 0%,
+        #060e16 100%
+      );
+      background-color: #5aa0c8;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(
+        180deg,
+        var(--sky-top) 0%,
+        var(--sky-bot) 25%,
+        var(--water-top) 55%,
+        var(--water-abyss) 100%
+      );
+      color: var(--text-water);
+      overflow-x: clip;
+      background-color: var(--water-abyss);
+    }
+
+    /* CSS ID (element name tag) selector (#) */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      gap: 2vw;
+      padding: clamp(12px, 4dvh, 48px) clamp(16px, 10vw, 120px) 0;
+      pointer-events: none;
+    }
+
+    /* CSS class selector (.) */
+    .cloud-link {
+      pointer-events: all;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.5rem, 0.5rem + 1vw, 1rem);
+      font-weight: 500;
+      line-height: 2;
+      color: #1e3d52;
+      background: var(--cloud);
+      border-radius: clamp(26px, 4.8vw, 56px);
+      min-height: clamp(28px, 4.2vw, 44px);
+      padding: 0 clamp(14px, 2.3vw, 28px) clamp(4px, 0.55vw, 7px);
+      position: relative;
+      isolation: isolate;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 3px 12px rgba(80,140,190,0.22), inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+    .cloud-link::before, .cloud-link::after {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      background: var(--cloud);
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .cloud-link-label {
+      position: relative;
+      z-index: 1;
+    }
+    .cloud-link::before { width: 54%; height: 74%; top: -35%; left: 13%; }
+    .cloud-link::after  { width: 38%; height: 58%; top: -27%; left: 49%; }
+    .cloud-link:hover { background: #b8d4e8; transform: translateY(-1px); }
+    .cloud-link:hover::before, .cloud-link:hover::after { background: #b8d4e8; }
+
+    #hero {
+      position: relative;
+      width: 100%;
+      /* 100vh vs dynamic viewport on mobile can leave a thin strip at the fold */
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .sky-layer {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg,
+        #5aa0c8 0%,
+        #7cbcda 28%,
+        #a8d4ec 58%,
+        #c2e2f4 73%,
+        #cde8f6 78%,
+        var(--sky-bot) 88%,
+        var(--hero-shallow-water) 100%
+      );
+      z-index: 0;
+    }
+
+    .sky-layer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(255,255,255,0.18), transparent 20%),
+        radial-gradient(circle at 77% 18%, rgba(255,255,255,0.12), transparent 18%),
+        radial-gradient(circle at 55% 34%, rgba(255,255,255,0.08), transparent 24%);
+      pointer-events: none;
+    }
+
+    /* Static fill under animated water so translateY/scale never reveals light sky at the hero fold */
+    .hero-water-matte {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 40%;
+      bottom: 0;
+      z-index: 1;
+      pointer-events: none;
+      /* Depth tint only; chroma ramp lives on .water-surface-hero */
+      background: linear-gradient(180deg,
+        rgba(46, 122, 158, 0) 0%,
+        rgba(46, 122, 158, 0.08) 38%,
+        rgba(46, 122, 158, 0.2) 62%,
+        rgba(46, 122, 158, 0.32) 82%,
+        rgba(46, 122, 158, 0.12) 100%
+      );
+    }
+
+    .horizon-haze {
+      position: absolute;
+      bottom: 20%;
+      left: 0; right: 0;
+      height: 56px;
+      background: linear-gradient(180deg, transparent, rgba(120,190,225,0.55));
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .water-surface-hero {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: calc(30% + 20px);
+      /* One ramp: hero sky / shallow water → bridge → surface → ocean (--water-top) */
+      background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(184, 218, 240, 0.4) 6%,
+        var(--sky-bot) 20%,
+        var(--water-top) 50%
+      );
+      z-index: 2;
+      will-change: transform;
+    }
+
+    .back-wave-wrap,
+    .front-wave-wrap {
+      position: absolute;
+      left: -8%;
+      width: 116%;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .back-wave-wrap {
+      bottom: 16.8%;
+      height: 14vh;
+      z-index: 5;
+      opacity: 0.92;
+      filter: drop-shadow(0 10px 18px rgba(10, 56, 84, 0.18));
+    }
+
+    .front-wave-wrap {
+      bottom: 12.2%;
+      height: 19vh;
+      z-index: 60;
+      opacity: 0.995;
+      overflow: visible;
+      isolation: isolate;
+      filter: drop-shadow(0 -2px 0 rgba(255,255,255,0.08));
+      /* Fade the wave in smoothly near its top edge to remove the seam line. */
+      -webkit-mask-image: linear-gradient(
+        180deg,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,1) 22%,
+        rgba(0,0,0,1) 100%
+      );
+      mask-image: linear-gradient(
+        180deg,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,1) 22%,
+        rgba(0,0,0,1) 100%
+      );
+    }
+    .front-wave-wrap::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -2%;
+      height: 62%;
+      background: linear-gradient(180deg,
+        rgba(65, 159, 194, 0.78) 0%,
+        rgba(50, 139, 173, 0.68) 22%,
+        rgba(31, 105, 139, 0.52) 48%,
+        rgba(18, 76, 108, 0.18) 74%,
+        /* Match the fade-out to the underlying --water-top color. */
+        rgba(46, 122, 158, 0) 100%
+      );
+      filter: blur(8px);
+      pointer-events: none;
+    }
+
+    .wave-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .wave-seam {
+      position: absolute;
+      left: -8%; width: 116%;
+      height: 26px;
+      border-radius: 50%;
+      transform-origin: center;
+      z-index: 4;
+    }
+    .ws1 { bottom: 20%; background: #3a9abe; opacity: 0.95; }
+    .ws2 { bottom: 19%; background: #2a82a4; opacity: 0.65; }
+    .ws3 { bottom: 18%; background: #1e6a8c; opacity: 0.4;  }
+
+    .foam-line {
+      position: absolute;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, var(--foam), transparent);
+      opacity: 0.7;
+      filter: blur(0.4px);
+      z-index: 26;
+      will-change: transform, opacity;
+    }
+
+    .hero-spray {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(212,244,255,0.3) 60%, transparent 70%);
+      opacity: 0;
+      z-index: 26;
+      will-change: transform, opacity;
+    }
+
+    .shimmer {
+      position: absolute;
+      height: 2px;
+      border-radius: 2px;
+      background: rgba(180,230,255,0.2);
+      transform-origin: left center;
+      opacity: 0;
+      z-index: 6;
+    }
+
+    #hero-text {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      width: min(620px, 82vw);
+      color: var(--text-sky);
+      z-index: 30;
+    }
+    #hero-text h1 {
+      font-family: 'Manrope', sans-serif;
+      font-size: clamp(2.4rem, 5.5vw, 3.4rem);
+      font-weight: 780;
+      color: #0c2030;
+      margin-bottom: 18px;
+      letter-spacing: -0.022em;
+      line-height: 1.08;
+    }
+    #hero-text p {
+      font-size: clamp(0.9rem, 1.6vw, 1.02rem);
+      color: #1a3850;
+      line-height: 1.82;
+      font-weight: 400;
+    }
+    #hero-text em { font-style: normal; font-weight: 700; color: #0c2030; }
+    .scroll-cue {
+      margin-top: 20px;
+      font-size: 0.83rem;
+      letter-spacing: 0.06em;
+      color: #26506a;
+      font-weight: 500;
+    }
+
+    #submarine {
+      position: fixed;
+      left: 3vw;
+      z-index: 8;
+      width: clamp(126px, 12vw, 168px);
+      /* top is driven every frame in JS; a CSS transition here fights rAF and causes jitter */
+      pointer-events: none;
+      transform-origin: 42% 52%;
+      filter: drop-shadow(0 10px 16px rgba(13, 44, 67, 0.26));
+      will-change: transform, top;
+    }
+
+    #submarine svg { overflow: visible; }
+
+    #scroll-arrow {
+      position: absolute;
+      bottom: 9%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      /* Keep Projects CTA in front of the surface waves. */
+      z-index: 90;
+      animation: bounce 2.8s ease-in-out infinite;
+    }
+    #scroll-arrow span {
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.98);
+      font-weight: 500;
+    }
+    .chev {
+      width: 28px;
+      height: 15px;
+      position: relative;
+    }
+    .chev::before, .chev::after {
+      content: '';
+      position: absolute;
+      width: 15px;
+      height: 2px;
+      top: 7px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 999px;
+    }
+    .chev::before {
+      left: 1px;
+      transform: rotate(32deg);
+      transform-origin: right center;
+    }
+    .chev::after {
+      right: 1px;
+      transform: rotate(-32deg);
+      transform-origin: left center;
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      55% { transform: translateX(-50%) translateY(9px); }
+    }
+
+    #timeline-section {
+      --timeline-pad-top: calc(56px + 1px);
+      --timeline-pad-bottom: 18px;
+      --timeline-spacer-after: 28px;
+      --timeline-axis-gap: 30px;
+      position: relative;
+      margin-top: -2px;
+      padding: var(--timeline-pad-top) 0 var(--timeline-pad-bottom);
+      /* Fallback under .water-bg; feather layer meets this so no html/body flash */
+      background-color: var(--water-top);
+    }
+
+    #timeline-section::before,
+    #timeline-section::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(140, 210, 245, 0.5);
+      border: 1px solid rgba(180, 230, 255, 0.55);
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    #timeline-section::before {
+      top: calc(var(--timeline-pad-top) - var(--timeline-axis-gap));
+      transform: translate(-50%, -50%);
+    }
+
+    #timeline-section::after {
+      bottom: calc(var(--timeline-pad-bottom) + var(--timeline-spacer-after) + var(--timeline-axis-gap));
+      transform: translate(-50%, 50%);
+    }
+
+    .timeline-tail-spacer {
+      height: var(--timeline-spacer-after);
+      position: relative;
+      z-index: 3;
+    }
+    .water-bg {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -28px;
+      bottom: -12px;
+      width: 100%;
+      z-index: 0;
+      /* Hero ends on --water-top; overlap avoids seam, gradient continues into the depths */
+      background: linear-gradient(180deg,
+        var(--water-top) 0%,
+        var(--water-mid)   30%,
+        var(--water-deep)  65%,
+        var(--water-abyss) 100%
+      );
+    }
+
+    .bubbles { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1; }
+    .bubble {
+      position:absolute; border-radius:50%;
+      background: rgba(160,215,245,0.14);
+      animation: rise linear infinite;
+    }
+    @keyframes rise {
+      0%   { transform:translateY(0);      opacity:0;   }
+      8%   { opacity:0.5; }
+      92%  { opacity:0.15; }
+      100% { transform:translateY(-700px); opacity:0;   }
+    }
+
+    .timeline-line {
+      position: absolute;
+      left: 50%;
+      top: calc(var(--timeline-pad-top) - var(--timeline-axis-gap));
+      bottom: calc(var(--timeline-pad-bottom) + var(--timeline-spacer-after) + var(--timeline-axis-gap));
+      width: 1px;
+      background: linear-gradient(180deg, rgba(160,215,245,0.28), rgba(100,170,210,0.07));
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+
+    .timeline-entry {
+      --timeline-gap: 60px;
+      position:relative; z-index:3;
+      display:flex;
+      justify-content: flex-start;
+      padding: 0 28px var(--timeline-gap);
+      opacity:0; transform:translateY(24px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .timeline-entry.visible { opacity:1; transform:translateY(0); }
+
+    /* One dot per gap between cards, centered in the bottom padding strip */
+    .timeline-entry:not(:last-child)::before {
+      content:'';
+      position:absolute; left:50%; top:auto;
+      bottom: calc(var(--timeline-gap) / 2 - 5px);
+      width:10px; height:10px; border-radius:50%;
+      background: rgba(140,210,245,0.5);
+      border: 1px solid rgba(180,230,255,0.55);
+      transform:translateX(-50%);
+      z-index:4;
+    }
+
+    .entry-card {
+      --entry-body-gap: clamp(10px, 1.15vw, 14px);
+      position: relative;
+      z-index: 1;
+      margin-left: 165px;
+      width: calc(100% - 165px - 28px);
+      background: linear-gradient(
+        155deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(18, 62, 88, 0.38) 48%,
+        rgba(10, 40, 58, 0.45) 100%
+      );
+      border: 1px solid rgba(170, 220, 245, 0.2);
+      border-radius: 6px;
+      padding: clamp(16px, 2vw, 22px) clamp(18px, 2.6vw, 26px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px) saturate(1.12);
+      -webkit-backdrop-filter: blur(14px) saturate(1.12);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "title date"
+        "role location"
+        "body body";
+      column-gap: clamp(14px, 3vw, 28px);
+      row-gap: clamp(2px, 0.7vw, 8px);
+      align-items: start;
+    }
+
+    .entry-title,
+    .entry-date,
+    .entry-role,
+    .entry-location,
+    .entry-body,
+    .entry-description,
+    .entry-responsibilities,
+    .entry-view-link {
+      margin: 0;
+      min-width: 0;
+    }
+
+    .entry-body {
+      grid-area: body;
+      display: flex;
+      flex-direction: column;
+      gap: var(--entry-body-gap);
+      margin-top: var(--entry-body-gap);
+    }
+
+    .entry-title {
+      grid-area: title;
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1rem, 0.92rem + 0.7vw, 1.22rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: #d5eeff;
+      align-self: end;
+    }
+
+    .entry-date {
+      grid-area: date;
+      font-size: clamp(0.72rem, 0.66rem + 0.28vw, 0.86rem);
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: right;
+      white-space: nowrap;
+      color: #d6eeff;
+      align-self: end;
+    }
+
+    .entry-role {
+      grid-area: role;
+      font-size: clamp(0.7rem, 0.64rem + 0.26vw, 0.82rem);
+      font-weight: 500;
+      line-height: 1.3;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #62b4d4;
+      text-align: left;
+    }
+
+    .entry-location {
+      grid-area: location;
+      font-size: clamp(0.7rem, 0.64rem + 0.26vw, 0.82rem);
+      font-weight: 500;
+      line-height: 1.3;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #62b4d4;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .entry-description {
+      font-size: clamp(0.94rem, 0.88rem + 0.22vw, 1.02rem);
+      line-height: 1.75;
+      font-weight: 300;
+      color: #cce9f7;
+    }
+
+    .entry-responsibilities {
+      list-style: disc;
+      padding-left: 1.2em;
+      font-size: clamp(0.82rem, 0.78rem + 0.16vw, 0.9rem);
+      line-height: 1.65;
+      font-weight: 300;
+      color: #9bc2d5;
+    }
+
+    .entry-responsibilities li {
+      margin-bottom: 0.45em;
+    }
+
+    .entry-responsibilities li:last-child {
+      margin-bottom: 0;
+    }
+
+    .entry-view-link {
+      align-self: flex-start;
+      font-size: clamp(0.78rem, 0.74rem + 0.14vw, 0.86rem);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: #9bc2d5;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(155, 194, 213, 0.35);
+      padding-bottom: 1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .entry-view-link:hover {
+      color: #cce9f7;
+      border-bottom-color: rgba(204, 233, 247, 0.55);
+    }
+
+    .entry-view-link-arrow {
+      display: inline-block;
+      margin-left: 0.4em;
+      font-weight: 300;
+      font-size: 1.05em;
+      line-height: 0;
+      transform: translateY(0.04em);
+      transition: transform 0.22s ease;
+    }
+
+    .entry-view-link:hover .entry-view-link-arrow {
+      transform: translate(0.2em, 0.04em);
+    }
+
+    #ocean-floor {
+      position:relative; width:100%; height:22vh;
+      margin-top: -3px;
+      background: linear-gradient(180deg, var(--water-abyss) 0%, #060e16 100%);
+      overflow:hidden;
+      z-index: 1;
+    }
+    .sand {
+      position:absolute; bottom:0; left:0; right:0; height:52%;
+      background: linear-gradient(180deg, var(--sand-dark) 0%, #5a4020 100%);
+    }
+    .sand::before {
+      content:''; position:absolute; top:-16px; left:-5%;
+      width:110%; height:36px;
+      background: var(--sand-dark); border-radius:50%;
+    }
+    .pebble { position:absolute; border-radius:50%; background:#4a3015; }
+
+    .floor-contact {
+      position:absolute;
+      /* Sand band is bottom 52% of #ocean-floor; keep contact in that strip */
+      bottom: clamp(14px, 22%, 64px);
+      left:50%; transform:translateX(-50%);
+      display:flex; gap:52px;
+      z-index: 2;
+      color: rgba(228, 210, 175, 0.92);
+      font-size:0.8rem; letter-spacing:0.08em;
+      font-weight:400; white-space:nowrap; text-align:center;
+    }
+    .floor-contact a { color:inherit; text-decoration:underline; text-underline-offset:3px; }
+
+    #return-top {
+      position:fixed; bottom:26px; right:26px; z-index:200;
+      background: rgba(10,35,55,0.8);
+      color: rgba(155,215,245,0.9);
+      border: 1px solid rgba(110,185,220,0.22);
+      border-radius:4px; padding:9px 16px;
+      font-size:0.72rem; letter-spacing:0.1em;
+      cursor:pointer; font-family:'DM Sans',sans-serif;
+      font-weight:500; text-transform:uppercase;
+      opacity:0; pointer-events:none;
+      transition:opacity 0.3s; backdrop-filter:blur(8px);
+    }
+    #return-top.show { opacity:1; pointer-events:all; }
+    #return-top:hover { background:rgba(18,55,85,0.92); }
+    
+    /* CSS media style applications for devices under certain widths: */
+    @media (max-width: 900px) {
+      #navbar { gap: 10px; padding-top: 12px; flex-wrap: wrap; }
+      #hero-text { width: min(700px, 88vw); top: 36%; }
+      .entry-card {
+        margin-left: 96px;
+        width: calc(100% - 96px - 20px);
+        column-gap: 16px;
+      }
+      #submarine { width: clamp(112px, 26vw, 144px); left: 2.5vw; }
+      .floor-contact { gap: 20px; font-size: 0.7rem; }
+    }
+
+    @media (max-width: 640px) {
+      #timeline-section::before,
+      #timeline-section::after,
+      .timeline-line,
+      .timeline-entry:not(:last-child)::before {
+        left: 28px;
+      }
+      .timeline-line,
+      .timeline-entry:not(:last-child)::before {
+        transform: translateX(-50%);
+      }
+      #timeline-section::before {
+        transform: translate(-50%, -50%);
+      }
+      #timeline-section::after {
+        transform: translate(-50%, 50%);
+      }
+      .entry-card {
+        margin-left: 28px;
+        width: calc(100% - 28px);
+        padding: 16px 18px;
+      }
+      #hero-text h1 { font-size: clamp(2rem, 8vw, 3rem); }
+      #hero-text p { font-size: 0.94rem; }
+      .floor-contact {
+        flex-direction: column;
+        gap: 8px;
+        top: 16%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .entry-card {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "title"
+          "role"
+          "date"
+          "location"
+          "body";
+        row-gap: 4px;
+      }
+
+      .entry-date,
+      .entry-location {
+        text-align: left;
+        white-space: normal;
+      }
+
+      .entry-body {
+        margin-top: 10px;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a class="cloud-link" href="https://www.linkedin.com/in/brian-jing/"  target="_blank"><span class="cloud-link-label">LinkedIn</span></a>
+  <a class="cloud-link" href="https://drive.google.com/file/d/1Zu67D0MsTx_-hEqcfjhemuDfn6Olpk-I/view?usp=sharing" target="_blank"><span class="cloud-link-label">Resume</span></a>
+  <a class="cloud-link" href="https://github.com/brianjjing" target="_blank"><span class="cloud-link-label">GitHub</span></a>
+  <a class="cloud-link" href="https://www.kaggle.com/brianjing" target="_blank"><span class="cloud-link-label">Kaggle</span></a>
+  <a class="cloud-link" href="mailto:bjing@ucsd.edu"><span class="cloud-link-label">Contact</span></a>
+</nav>
+
+<section id="hero">
+  <div class="sky-layer"></div>
+  <div class="hero-water-matte" aria-hidden="true"></div>
+  <div class="horizon-haze"></div>
+
+  <div class="back-wave-wrap" id="back-wave-wrap" aria-hidden="true">
+    <svg class="wave-svg" viewBox="0 0 1200 180" preserveAspectRatio="none">
+      <path d="M0 112 C 80 88, 155 132, 235 110 S 390 74, 470 108 S 630 144, 720 114 S 870 70, 955 106 S 1120 142, 1200 112 L 1200 180 L 0 180 Z" fill="rgba(73, 161, 195, 0.92)"></path>
+      <path d="M0 112 C 80 88, 155 132, 235 110 S 390 74, 470 108 S 630 144, 720 114 S 870 70, 955 106 S 1120 142, 1200 112" fill="none" stroke="rgba(224, 245, 255, 0.55)" stroke-width="5" stroke-linecap="round"></path>
+    </svg>
+  </div>
+
+  <div class="water-surface-hero"></div>
+  <div class="wave-seam ws1"></div>
+  <div class="wave-seam ws2"></div>
+  <div class="wave-seam ws3"></div>
+
+  <div class="shimmer" style="width:80px; left:10%; bottom:11%;"></div>
+  <div class="shimmer" style="width:55px; left:28%; bottom:8%;"></div>
+  <div class="shimmer" style="width:95px; left:52%; bottom:13%;"></div>
+  <div class="shimmer" style="width:65px; left:70%; bottom:9%;"></div>
+  <div class="shimmer" style="width:45px; left:86%; bottom:11%;"></div>
+
+  <div class="foam-line" style="left:6%; bottom:16.7%; width:90px; height:4px;"></div>
+  <div class="foam-line" style="left:18%; bottom:15.9%; width:46px; height:3px;"></div>
+  <div class="foam-line" style="left:58%; bottom:16.4%; width:74px; height:4px;"></div>
+  <div class="foam-line" style="left:72%; bottom:15.5%; width:52px; height:3px;"></div>
+  <div class="hero-spray" style="left:13%; bottom:18.5%;"></div>
+  <div class="hero-spray" style="left:16%; bottom:17.6%;"></div>
+  <div class="hero-spray" style="left:63%; bottom:18.3%;"></div>
+  <div class="hero-spray" style="left:67%; bottom:17.8%;"></div>
+
+  <div id="hero-text">
+    <h1>Brian Jing</h1>
+    <p>
+      Hi! I'm a second-year <em>data science undergrad</em> @ UCSD.<br/>
+      I focus on building AI products to solve healthcare and fitness problems.
+      Currently, I'm building <em>POWERCOACH</em> — a real-time powerlifting form correction app
+      aimed at helping lifters train injury-free.
+      I dabble in software dev too! I'm currently also building a physician-facing web app for 
+      UCSD Prof. Rose Yu's <em>Spatiotemporal ML Lab</em>, in order to display results obtained by the lab's 
+      smart pumping algorithm for the Impella heart pumping device.
+    </p>
+    <p class="scroll-cue">Curious about my projects? Scroll down to dive in ↓</p>
+  </div>
+
+  <div class="front-wave-wrap" id="front-wave-wrap" aria-hidden="true">
+    <svg class="wave-svg" viewBox="0 0 1200 240" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="frontWaveFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--water-top)" stop-opacity="0.96"/>
+          <stop offset="18%" stop-color="var(--water-top)" stop-opacity="0.95"/>
+          <stop offset="44%" stop-color="var(--water-top)" stop-opacity="0.94"/>
+          <stop offset="74%" stop-color="var(--water-top)" stop-opacity="0.70"/>
+          <stop offset="100%" stop-color="var(--water-top)" stop-opacity="0.00"/>
+        </linearGradient>
+      </defs>
+      <path d="M0 120 C 75 82, 160 154, 260 118 S 435 72, 530 118 S 675 156, 780 122 S 930 76, 1030 118 S 1145 150, 1200 130 L 1200 240 L 0 240 Z" fill="url(#frontWaveFill)"></path>
+      <path d="M0 120 C 75 82, 160 154, 260 118 S 435 72, 530 118 S 675 156, 780 122 S 930 76, 1030 118 S 1145 150, 1200 130" fill="none" stroke="rgba(235,248,255,0.88)" stroke-width="7" stroke-linecap="round"></path>
+      <path d="M0 134 C 92 100, 176 164, 279 128 S 442 88, 546 130 S 698 170, 801 132 S 939 92, 1040 130 S 1148 160, 1200 146" fill="none" stroke="rgba(201,236,250,0.26)" stroke-width="16" stroke-linecap="round"></path>
+    </svg>
+  </div>
+
+  <div id="scroll-arrow" onclick="document.getElementById('timeline-section').scrollIntoView({behavior:'smooth'})">
+    <!-- <span>Dive in</span> -->
+    <!-- <div class="chev"></div> -->
+    <div class="chev"></div>
+    <div class="chev"></div>
+  </div>
+</section>
+
+<div id="submarine">
+  <svg viewBox="0 0 180 96" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+    <defs>
+      <linearGradient id="subBody" x1="0" x2="1">
+        <stop offset="0%" stop-color="#caa73d"/>
+        <stop offset="55%" stop-color="#dfbf58"/>
+        <stop offset="100%" stop-color="#ae881c"/>
+      </linearGradient>
+      <linearGradient id="subShadow" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.26)"/>
+        <stop offset="100%" stop-color="rgba(95,64,0,0.18)"/>
+      </linearGradient>
+      <radialGradient id="beamGlow" cx="0%" cy="50%" r="100%">
+        <stop offset="0%" stop-color="#ffe87a" stop-opacity="0.75"/>
+        <stop offset="70%" stop-color="#ffe87a" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#ffe87a" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+
+    <g id="sub-group">
+      <polygon id="sub-beam" points="150,50 212,18 212,82" fill="url(#beamGlow)" opacity="0"></polygon>
+      <ellipse cx="85" cy="52" rx="63" ry="24" fill="url(#subBody)"></ellipse>
+      <ellipse cx="85" cy="56" rx="61" ry="17" fill="rgba(96,73,9,0.16)"></ellipse>
+      <ellipse cx="85" cy="52" rx="63" ry="24" fill="none" stroke="#8e6f17" stroke-width="1.8" opacity="0.46"></ellipse>
+
+      <path d="M57 26 C 61 18, 77 14, 92 17 C 102 19, 112 24, 116 31 L 57 31 Z" fill="#bf9a2d"></path>
+      <rect x="61" y="24" width="42" height="18" rx="7" fill="#ba9528"></rect>
+      <rect x="61" y="24" width="42" height="18" rx="7" fill="none" stroke="#89691a" stroke-width="1.2" opacity="0.45"></rect>
+      <rect x="74" y="10" width="4" height="16" rx="2" fill="#8f7318"></rect>
+      <rect x="70" y="10" width="12" height="4" rx="2" fill="#8f7318"></rect>
+      <rect x="83" y="12" width="2.6" height="12" rx="1.3" fill="#8f7318" opacity="0.76"></rect>
+
+      <ellipse cx="28" cy="51" rx="8" ry="14" fill="#b58f22"></ellipse>
+      <rect x="18" y="49" width="14" height="5" rx="2.5" fill="#957716"></rect>
+      <ellipse cx="22" cy="43" rx="4.5" ry="8" fill="#b58f22" opacity="0.72"></ellipse>
+      <ellipse cx="22" cy="59" rx="4.5" ry="8" fill="#b58f22" opacity="0.72"></ellipse>
+
+      <ellipse cx="145" cy="52" rx="8" ry="12" fill="#b99224"></ellipse>
+      <circle cx="149" cy="52" r="7.2" fill="#ffd95a" opacity="0.94" id="sub-headlight"></circle>
+      <circle cx="149" cy="52" r="3.5" fill="#fff7bc"></circle>
+
+      <circle cx="96" cy="52" r="8" fill="#2e6080"></circle>
+      <circle cx="96" cy="52" r="5.2" fill="#183f59"></circle>
+      <circle cx="96" cy="52" r="2.7" fill="#5ea4c8" opacity="0.6"></circle>
+
+      <circle cx="67" cy="52" r="6.2" fill="#2e6080"></circle>
+      <circle cx="67" cy="52" r="4.2" fill="#183f59"></circle>
+      <circle cx="67" cy="52" r="2.1" fill="#5ea4c8" opacity="0.56"></circle>
+
+      <path d="M42 36 Q 87 18 132 34" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="3" stroke-linecap="round"></path>
+      <ellipse cx="86" cy="46" rx="50" ry="11" fill="url(#subShadow)" opacity="0.7"></ellipse>
+
+      <circle cx="46" cy="45" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
+      <circle cx="46" cy="59" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
+      <circle cx="116" cy="45" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
+      <circle cx="116" cy="59" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
+    </g>
+  </svg>
+</div>
+
+<section id="timeline-section">
+  <div class="water-bg"></div>
+  <div class="bubbles" id="bubbles"></div>
+  <div class="timeline-line"></div>
+
+  <div class="timeline-entry"><div class="entry-card">
+    <div class="entry-title">Rose Spatiotemporal ML Lab 🫀</div>
+    <div class="entry-role">Full-Stack AI Developer</div>
+    <div class="entry-location">La Jolla, CA</div>
+    <div class="entry-date">Feb 2026 – Present</div>
+    <div class="entry-body">
+      <div class="entry-description">Developing a React + Python API physician-facing web app for the AI weaning (withdrawing strength over time) of a heart-pumping device. App displays metrics for this AI weaning algorithm, enabling physician evaluation of pump weaning sequences.
+      </div>
+      <ul class="entry-responsibilities">
+        <li>Developed an interactive interface with a pump-level sequence simulator, displaying trajectories of 12 cardiovascular features over 6-hour treatment sequence windows</li>
+        <li>Displayed physician-interpretable RL evaluation metrics for weaning sequences to support clinician decision-making</li>
+        <li>Aimed for implementation into the Impella device, used by 50,000+ US patients</li>
+      </ul>
+      <a class="entry-view-link" href="https://github.com/brianjjing/impella_better_ui">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div></div>
+
+  <div class="timeline-entry"><div class="entry-card">
+    <div class="entry-title">POWERCOACH 💪</div>
+    <div class="entry-role">Founder, AI Engineer</div>
+    <div class="entry-location">La Jolla / Irvine, CA</div>
+    <div class="entry-date">August 2024 – Present</div>
+    <div class="entry-body">
+      <div class="entry-description">Building a real-time mobile lifting form correction app to help lifters avoid injuries, 
+        targeted for home gymmers without a gym bro.</div>
+      <ul class="entry-responsibilities">
+        <li>Engineering a PyTorch neural network pipeline using spatiotemporal data sequences
+          to classify form errors for smartphone footage of 10 common powerlifting exercises</li>
+        <li>Built a data pipeline to extract clips from USA Powerlifting footage, converting ∼10 video hours 
+          to 25,000+ tabular, frame-level data points for threshold-based fault detection training</li>
+        <li>Developed a real-time app using Flask and WebSockets, delivering low-latency audiovisual
+          feedback to the React frontend through JPEG compression and payload minimization</li>
+      </ul>
+      <a class="entry-view-link" href="https://apps.apple.com/us/app/pwrcch/id6751323312">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div></div>
+
+  <div class="timeline-entry"><div class="entry-card">
+    <div class="entry-title">AIBRT 🧠</div>
+    <div class="entry-role">Software Engineer Intern</div>
+    <div class="entry-location">La Jolla, CA</div>
+    <div class="entry-date">Feb 2026 – Mar 2026</div>
+    <div class="entry-body">
+      <div class="entry-description">Built a game to prove Dr. Robert Epstein's Generativity Theory (GT), for his American Institute for Behavioral Research & Tech (AIBRT). GT involves equations predicting human behavior during a problem, and equations are validated by their prediciton of player actions.</div>
+      <ul class="entry-responsibilities">
+        <li>Built a real-time Python game environment, paired with an experimenter view displaying dynamic GT predictors alongside player actions for live model validation</li>
+        <li>Designed a SQLite data pipeline to log actions for theory validation, restructuring legacy schema into a lighter, normalized database architecture with improved data integrity</li>
+        <li>Compressed legacy code space to less than 50% its original size while preserving all functionality, improving system performance and maintainability</li>
+      </ul>
+      <a class="entry-view-link" href="https://github.com/brianjjing/GT-Codebase">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div></div>
+
+  <div class="timeline-entry"><div class="entry-card">
+    <div class="entry-title">Eclipse Analytics 🏀</div>
+    <div class="entry-role">ML Project Manager, Data Science Consultant</div>
+    <div class="entry-location">La Jolla, CA</div>
+    <div class="entry-date">Oct 2025 - Mar 2026</div>
+    <div class="entry-body">
+      <div class="entry-description">UCSD sports analytics club where I first led a project to find the most clutch NBA player (Fall 2025). Then, I worked on developing the club's consulting team's basketball player tracking model, for analyzing UCSD Men's Basketball performance (Winter 2026).</div>
+      <ul class="entry-responsibilities">
+        <li>Fine-tuned Meta’s SAM 2 model for continuous basketball player tracking through player overlap and frame cuts,
+          leveraging number recognition and distance from court keypoints</li>
+        <li>Led 3 sports analysts to build a PCA + Ridge Regression stacking ensemble, reduced 30+ 
+          game features to 1 “clutchness” score for 700+ NBA players while retaining 82% variance</li>
+        <li>Aggregated clutch-time usage rates, scoring impact, and performance under pressure to engineered a clutch-time “game changer” meta-feature used in PCA</li>
+      </ul>
+      <a class="entry-view-link" href="https://github.com/brianjjing/what-makes-a-clutch-player">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div></div>
+
+  <div class="timeline-entry"><div class="entry-card">
+    <div class="entry-title">BFRB Gesture Classification 👋</div>
+    <div class="entry-role">Independent Project</div>
+    <div class="entry-location">Irvine, CA</div>
+    <div class="entry-date">Jun 2025 – Sep 2025</div>
+    <div class="entry-body">
+      <div class="entry-description">Built an XGBoost + PyTorch pipeline to classify different body-focused repetitive behaviors (BFRBs) based on wrist-worn sensor data, for a Kaggle competition.</div>
+      <ul class="entry-responsibilities">
+        <li>Performed multivariate imputation on 30,000+ missing data entries, preserving imputed feature variance through Bayesian optimization of imputation hyperparameters</li>
+        <li>Reduced 300 of the dataset’s redundant raw sensor variables to 25 statistical features, boosting training efficiency while maintaining classification accuracy </li>
+        <li>Improved testing F1 score by ∼40% using 5-fold cross validation</li>
+      </ul>
+      <a class="entry-view-link" href=https://www.kaggle.com/code/brianjing/child-mind-institute-bfrb?scriptVersionId=289645396">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div></div>
+
+  <div class="timeline-entry"><div class="entry-card">
+    <div class="entry-title">X-Ray Tuberculosis Detector 🦠</div>
+    <div class="entry-role">Independent Project</div>
+    <div class="entry-location">Irvine, CA</div>
+    <div class="entry-date">Jun 2024 – Jul 2024</div>
+    <div class="entry-body">
+      <div class="entry-description">My first project with computer vision, where I trained a Keras CNN to diagnose tuberculosis from chest X-rays.</div>
+      <ul class="entry-responsibilities">
+        <li>Achieved 98% testing accuracy for a Keras CNN on binary classification of 4,200+ images through Adam optimization and ReduceLROnPlateau</li>
+        <li>Open-sourced the model architecture on kaggle, calling on 2,000+ viewers to
+          develop it further and inspiring deeper exploration into computer vision innovations in healthcare</li>
+      </ul>
+      <a class="entry-view-link" href="https://www.kaggle.com/code/brianjing/tuberculosis-x-ray-diagnosis-cnn-classifier">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div></div>
+
+  <div class="timeline-entry"><div class="entry-card">
+    <div class="entry-title">Ignited Minds Nonprofit 💡</div>
+    <div class="entry-role">Data Science Lead</div>
+    <div class="entry-location">Irvine, CA / Remote in Malawi</div>
+    <div class="entry-date">Jul 2023 – Apr 2024</div>
+    <div class="entry-body">
+      <div class="entry-description">Cofounded a nonprofit organization to provide Malawian high schools with funding and specialized STEM education.</div>
+      <ul class="entry-responsibilities">
+        <li>Designed and taught the first data science curriculum for 11 Malawian high schools remotely, coordinating
+          technical infrastructure funding with local administrators</li>
+        <li>Iteratively enhanced teaching methods based on class participation metrics, fostering engaging learning
+          environments for introducing foundational Python and R skills to beginners</li>
+        <li>Grew a global online community of 1,000+ aspiring analysts through monthly follow-along blogs covering data science concepts and
+          technologies</li>
+      </ul>
+      <a class="entry-view-link" href="https://ignitedmindsusa.org/">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div></div>
+
+  <div class="timeline-entry"><div class="entry-card">
+    <div class="entry-title">UC Irvine ICS Summer Academy 🐜🍴</div>
+    <div class="entry-role">Academic Fellow</div>
+    <div class="entry-location">Irvine, CA</div>
+    <div class="entry-date">Jun 2023 – Jul 2023</div>
+    <div class="entry-body">
+      <div class="entry-description">Collaboratively built an Alzheimer's cognitive impairment level prediction pipeline using R at UCI's Information & Computer Sciences (ICS) Summer Academy. Began my data science journey with this project, continuing my theme of healthcare-themed projects throughout high school, all visible on my Kaggle.</div>
+      <ul class="entry-responsibilities">
+        <li>Reduced 15 neuroanatomical features to 5 predictors through multinomial LASSO feature selection, inputting them into a Random Forest classifier to achieve 90% binary Alzheimer's classification accuracy</li>
+        <li>Designed a threshold-based probabilistic diagnosis system to optimize the confidence-conclusiveness tradeoff, achieving 93% multiclass accuracy with a 90% confidence threshold</li>
+        <li>Performed extensive filtering and feature encoding on a clinical dataset of 2,700 patients × 57 biomarker features</li>
+      </ul>
+      <a class="entry-view-link" href="https://www.kaggle.com/code/brianjing/alzheimer-s-detection-model-using-r">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div></div>
+
+  <div class="timeline-tail-spacer" aria-hidden="true"></div>
+</section>
+
+<div id="ocean-floor">
+  <div class="sand"></div>
+  <div class="pebble" style="width:20px;height:13px;bottom:44%;left:15%;"></div>
+  <div class="pebble" style="width:11px;height:8px; bottom:46%;left:30%;"></div>
+  <div class="pebble" style="width:15px;height:10px;bottom:45%;left:55%;"></div>
+  <div class="pebble" style="width:24px;height:15px;bottom:43%;left:72%;"></div>
+  <div class="pebble" style="width:9px; height:7px; bottom:47%;left:88%;"></div>
+  <div class="floor-contact">
+    <a href="mailto:bjing@ucsd.edu">bjing@ucsd.edu</a>
+    <span>(949) 596-6942</span>
+  </div>
+</div>
+
+<button id="return-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ back to top</button>
+
+<script>
+  const bEl = document.getElementById('bubbles');
+  for (let i = 0; i < 28; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const s = 3 + Math.random() * 6;
+    b.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:${Math.random()*100}%;animation-duration:${9+Math.random()*14}s;animation-delay:${Math.random()*12}s;`;
+    bEl.appendChild(b);
+  }
+
+  const entries = document.querySelectorAll('.timeline-entry');
+  entries.forEach(e =>
+    new IntersectionObserver((obs) => {
+      obs.forEach(x => { if (x.isIntersecting) x.target.classList.add('visible'); });
+    }, { threshold: 0.12 }).observe(e)
+  );
+
+  const sub = document.getElementById('submarine');
+  const beam = document.getElementById('sub-beam');
+  const headlight = document.getElementById('sub-headlight');
+  const returnBtn = document.getElementById('return-top');
+  const hero = document.getElementById('hero');
+  const timeline = document.getElementById('timeline-section');
+  const oceanFloor = document.getElementById('ocean-floor');
+  const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const visualViewport = window.visualViewport;
+
+  const waveSeams = Array.from(document.querySelectorAll('.wave-seam'));
+  const shimmerEls = Array.from(document.querySelectorAll('.shimmer'));
+  const waterSurfaceHero = document.querySelector('.water-surface-hero');
+  const waterBg = document.querySelector('.water-bg');
+  const backWaveWrap = document.getElementById('back-wave-wrap');
+  const frontWaveWrap = document.getElementById('front-wave-wrap');
+  const foamLines = Array.from(document.querySelectorAll('.foam-line'));
+  const sprayEls = Array.from(document.querySelectorAll('.hero-spray'));
+
+  let thirdTop = null;
+  let subDepthTarget = 0;
+  let subDepthSmoothed = 0;
+
+  function clamp01(x) { return Math.max(0, Math.min(1, x)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  const OMEGA_FAST = (Math.PI * 2) / 16;
+  const OMEGA_SLOW = (Math.PI * 2) / 42;
+
+  const seamLayers = waveSeams.map((el, i) => {
+    let depth = 0.25;
+    if (el.classList.contains('ws1')) depth = 0.0;
+    if (el.classList.contains('ws2')) depth = 0.5;
+    if (el.classList.contains('ws3')) depth = 0.85;
+    return { el, depth, phase: i * 1.1 };
+  });
+
+  const waterSurfaceLineFromBottom = 0.20;
+  const shimmerLayers = shimmerEls.map((el, i) => {
+    const bottomStr = el.style.bottom || '';
+    const bottomPct = bottomStr.endsWith('%') ? parseFloat(bottomStr) / 100 : 0.10;
+    const depth = clamp01((waterSurfaceLineFromBottom - bottomPct) / waterSurfaceLineFromBottom);
+    return { el, depth, phase: i * 0.9 + 0.35 };
+  });
+
+  const foamData = foamLines.map((el, i) => ({ el, phase: i * 1.2, drift: (i % 2 === 0 ? 1 : -1) }));
+  const sprayData = sprayEls.map((el, i) => ({ el, phase: i * 0.75 + 0.2 }));
+
+  function setHeroSubLayering(inHeroPhase) {
+    // Hero: keep sub behind the front surface wave (front-wave-wrap z-index: 60).
+    // Past hero: sub (z-index: 2) above #ocean-floor deep band, below timeline entries (z-index: 3).
+    sub.style.zIndex = inHeroPhase ? '8' : '2';
+  }
+
+  function animateOcean(nowMs) {
+    const t = nowMs / 1000;
+    const syNow = window.scrollY;
+    const hHNow = hero ? hero.offsetHeight : 0;
+    const inHeroPhase = syNow < hHNow;
+    const subHNow = sub ? (sub.offsetHeight || 70) : 70;
+    const layoutVH = visualViewport ? visualViewport.height : window.innerHeight;
+    const vvOffsetTop = visualViewport ? visualViewport.offsetTop : 0;
+    const marginTop = 80;
+    const marginBottom = 10;
+
+    subDepthSmoothed += (subDepthTarget - subDepthSmoothed) * 0.14;
+    setHeroSubLayering(inHeroPhase);
+
+    if (!prefersReducedMotion) {
+      const surfaceBreathe = Math.sin(t * OMEGA_FAST) * 2.4;
+      if (waterSurfaceHero) {
+        waterSurfaceHero.style.transform = `translateY(${surfaceBreathe}px)`;
+      }
+
+      seamLayers.forEach(({ el, depth, phase }) => {
+        const omega = lerp(OMEGA_FAST, OMEGA_SLOW, depth);
+        const s = Math.sin(t * omega + phase);
+        const xPct = s * 1.5;
+        const scaleY = 1 + s * 0.12;
+        el.style.transform = `translateX(${xPct}%) scaleY(${scaleY})`;
+      });
+
+      if (backWaveWrap) {
+        const x = Math.sin(t * 0.44) * 1.2;
+        const y = Math.sin(t * 0.92 + 0.5) * 4.2;
+        const scaleY = 1 + Math.sin(t * 0.68 + 0.9) * 0.06;
+        backWaveWrap.style.transform = `translate(${x}%, ${y}px) scaleY(${scaleY})`;
+      }
+
+      if (frontWaveWrap) {
+        const x = Math.sin(t * 0.58 + 0.9) * 1.9;
+        const y = Math.sin(t * 1.08 + 0.2) * 7.5;
+        const scaleY = 1 + Math.sin(t * 0.82 + 0.4) * 0.1;
+        frontWaveWrap.style.transform = `translate(${x}%, ${y}px) scaleY(${scaleY})`;
+      }
+
+      shimmerLayers.forEach(({ el, depth, phase }) => {
+        const omega = lerp(OMEGA_FAST, OMEGA_SLOW, depth);
+        const s = Math.sin(t * omega + phase);
+        const u = (s + 1) / 2;
+        const x = s * 18;
+        const scaleX = 1 + s * 0.08;
+        const alpha = lerp(0.02, 0.22, u);
+        el.style.transform = `translateX(${x}px) scaleX(${scaleX})`;
+        el.style.opacity = String(alpha);
+      });
+
+      foamData.forEach(({ el, phase, drift }, i) => {
+        const s = Math.sin(t * 0.96 + phase);
+        const x = s * (8 + i * 0.5) * drift;
+        const y = Math.cos(t * 1.25 + phase) * 2.8;
+        el.style.transform = `translate(${x}px, ${y}px) scaleX(${1 + s * 0.06})`;
+        el.style.opacity = String(0.35 + ((s + 1) / 2) * 0.45);
+      });
+
+      sprayData.forEach(({ el, phase }) => {
+        const s = Math.sin(t * 1.6 + phase);
+        const u = (s + 1) / 2;
+        const y = -u * 10;
+        const x = Math.cos(t * 1.2 + phase) * 4.5;
+        el.style.transform = `translate(${x}px, ${y}px) scale(${0.7 + u * 0.45})`;
+        el.style.opacity = String(0.08 + u * 0.4);
+      });
+
+      /*
+        Idle motion: only vertical bob + light roll. Old sway used sin(ωt) and sin(0.64ωt+φ)
+        in X and Y — that Lissajous combo reads as a violent figure-8, especially when subDepth
+        jumped every scroll event.
+      */
+      const d = inHeroPhase ? 0 : subDepthSmoothed;
+      const omegaIdle = lerp(OMEGA_FAST, OMEGA_SLOW, d);
+      const bobIdle = Math.sin(t * omegaIdle + 0.75) * lerp(4, 2.2, d);
+      const rotIdle = Math.sin(t * omegaIdle + 2.1) * lerp(1.4, 0.55, d);
+      sub.style.transform = `translate(0, ${bobIdle}px) rotate(${rotIdle}deg)`;
+
+      /* Timeline .water-bg parallax removed: translateY caused horizontal seams vs neighbors */
+      if (waterBg) waterBg.style.transform = '';
+    } else {
+      if (waterSurfaceHero) waterSurfaceHero.style.transform = '';
+      waveSeams.forEach(el => (el.style.transform = ''));
+      shimmerEls.forEach(el => {
+        el.style.transform = '';
+        el.style.opacity = '0';
+      });
+      foamLines.forEach(el => {
+        el.style.transform = '';
+        el.style.opacity = '0.45';
+      });
+      sprayEls.forEach(el => {
+        el.style.transform = '';
+        el.style.opacity = '0.2';
+      });
+      if (backWaveWrap) backWaveWrap.style.transform = '';
+      if (frontWaveWrap) frontWaveWrap.style.transform = '';
+      if (waterBg) waterBg.style.transform = '';
+      sub.style.transform = '';
+    }
+
+    /*
+      Single source of truth for top (always): p = scroll progress (0 = page top, 1 = max scroll).
+      tStart = sub `top` at full up scroll (ocean surface band); tEnd = full down (hull half in sand).
+      Larger `top` = lower on screen. Scrolling down increases `top` (sub dives).
+    */
+    if (hero && oceanFloor && timeline) {
+      const docH = document.documentElement.scrollHeight;
+      const scrollMax = Math.max(1, docH - layoutVH);
+      const p = clamp01(syNow / scrollMax);
+
+      const heroR = hero.getBoundingClientRect();
+      const timelineR = timeline.getBoundingClientRect();
+      const floorR = oceanFloor.getBoundingClientRect();
+
+      let tStart = heroR.top + heroR.height * 0.80 - 42;
+      if (heroR.bottom < subHNow + 48) {
+        tStart = timelineR.top + Math.min(28, Math.max(12, timelineR.height * 0.035));
+      }
+
+      /* Top of .sand box; .sand::before rises ~16px above it (dune crest) */
+      const sandTopY = floorR.bottom - floorR.height * 0.52;
+      const sandSurfaceY = sandTopY - 10;
+      /* Land on sand: surface bisects hull so ~half the sub sits over the sand art */
+      let tEnd = sandSurfaceY - subHNow / 2;
+
+      tStart = Math.max(marginTop, Math.min(tStart, layoutVH - subHNow - marginBottom));
+      tEnd = Math.max(marginTop, Math.min(tEnd, layoutVH - subHNow - marginBottom));
+
+      if (tEnd < tStart + 8) tEnd = Math.min(tStart + 8, layoutVH - subHNow - marginBottom);
+
+      let baseTop = tStart + p * (tEnd - tStart);
+      baseTop = Math.max(marginTop, Math.min(baseTop, layoutVH - subHNow - marginBottom));
+
+      /* Visual viewport offset: fixed is layout-relative; offset tracks rubber-band overscroll */
+      sub.style.top = baseTop + vvOffsetTop + 'px';
+    }
+
+    requestAnimationFrame(animateOcean);
+  }
+
+  requestAnimationFrame(animateOcean);
+
+  function onScroll() {
+    const sy = window.scrollY;
+    const hH = hero.offsetHeight;
+    const tH = timeline.offsetHeight;
+    const vh = window.innerHeight;
+
+    if (!thirdTop && entries.length >= 3)
+      thirdTop = window.scrollY + entries[2].getBoundingClientRect().top;
+
+    returnBtn.classList.toggle('show', thirdTop && sy > thirdTop - vh * 0.5);
+
+    if (sy < hH) {
+      subDepthTarget = 0;
+      beam.setAttribute('opacity', '0');
+      headlight.setAttribute('opacity', '0.94');
+    } else {
+      const p = Math.min((sy - hH) / tH, 1);
+      subDepthTarget = p;
+      beam.setAttribute('opacity', Math.min(p * 1.5, 0.6).toFixed(2));
+      headlight.setAttribute('opacity', (0.88 + p * 0.12).toFixed(2));
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  if (visualViewport) {
+    visualViewport.addEventListener('scroll', onScroll, { passive: true });
+    visualViewport.addEventListener('resize', onScroll, { passive: true });
+  }
+  onScroll();
+</script>
+</body>
+</html>
