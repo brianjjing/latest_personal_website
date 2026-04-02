@@ -1261,38 +1261,39 @@
       const floorR = oceanFloor.getBoundingClientRect();
 
       let tStart = heroR.top + heroR.height * 0.80 - 42;
-      if (heroR.bottom < subHNow + 48) {
-        tStart = timelineR.top + Math.min(28, Math.max(12, timelineR.height * 0.035));
-      }
+      // if (heroR.bottom < subHNow + 48) {
+      //   tStart = timelineR.top + Math.min(28, Math.max(12, timelineR.height * 0.035));
+      // }
 
       /* Top of .sand box; .sand::before rises ~16px above it (dune crest) */
       const sandTopY = floorR.bottom - floorR.height * 0.52;
       const sandSurfaceY = sandTopY - 10;
       /* Land on sand: surface bisects hull so ~half the sub sits over the sand art */
       let tEnd = sandSurfaceY - subHNow / 2;
-
-      tStart = Math.max(marginTop, Math.min(tStart, layoutVH - subHNow - marginBottom));
-      // FIX 1
-      // tEnd = Math.max(marginTop, Math.min(tEnd, layoutVH - subHNow - marginBottom));
-      // if (tEnd < tStart + 8) tEnd = Math.min(tStart + 8, layoutVH - subHNow - marginBottom);
-      tEnd = Math.max(marginTop, tEnd);
-      if (tEnd < tStart + 8) tEnd = tStart + 8;
       
+      // Save the unclamped tEnd for our bottom overscroll math
+      const rawTEnd = tEnd; 
+
+      // RESTORE ORIGINAL CLAMPS: This keeps the submarine on the screen while scrolling!
+      tStart = Math.max(marginTop, Math.min(tStart, layoutVH - subHNow - marginBottom));
+      tEnd = Math.max(marginTop, Math.min(tEnd, layoutVH - subHNow - marginBottom));
+
+      if (tEnd < tStart + 8) tEnd = Math.min(tStart + 8, layoutVH - subHNow - marginBottom);
+
       let baseTop = tStart + p * (tEnd - tStart);
-      // FIX 2
-      // baseTop = Math.max(marginTop, Math.min(baseTop, layoutVH - subHNow - marginBottom));
-      baseTop = Math.max(marginTop, baseTop);
+      baseTop = Math.max(marginTop, Math.min(baseTop, layoutVH - subHNow - marginBottom));
 
-      /* Visual viewport offset: fixed is layout-relative; offset tracks rubber-band overscroll */
-      // FIX 3
-      // sub.style.top = baseTop + vvOffsetTop + 'px';
-
-      if (p >= 0.999) {
+      /* OVERRIDE FOR OVERSCROLL: Lock to absolute document coordinates at the absolute edges */
+      if (syNow <= 0) {
+        // Top overscroll: Lock to the exact document coordinate of the water line
         sub.style.position = 'absolute';
-        // Convert the viewport 'baseTop' coordinate to a document-relative Y coordinate
-        sub.style.top = (baseTop + window.scrollY) + 'px';
+        sub.style.top = (hero.offsetHeight * 0.80 - 42) + 'px';
+      } else if (syNow >= scrollMax) {
+        // Bottom overscroll: Lock to the exact document coordinate of the sand
+        sub.style.position = 'absolute';
+        sub.style.top = (rawTEnd + window.scrollY) + 'px';
       } else {
-        // While scrolling normally, keep it fixed to the screen for a smooth transition
+        // Normal scrolling: Keep it fixed to the viewport
         sub.style.position = 'fixed';
         sub.style.top = baseTop + vvOffsetTop + 'px';
       }
