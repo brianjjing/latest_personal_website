@@ -1,0 +1,57 @@
+<svg viewBox="0 0 180 96" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+    <defs>
+      <linearGradient id="subBody" x1="0" x2="1">
+        <stop offset="0%" stop-color="#caa73d"/>
+        <stop offset="55%" stop-color="#dfbf58"/>
+        <stop offset="100%" stop-color="#ae881c"/>
+      </linearGradient>
+      <linearGradient id="subShadow" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.26)"/>
+        <stop offset="100%" stop-color="rgba(95,64,0,0.18)"/>
+      </linearGradient>
+      <radialGradient id="beamGlow" cx="0%" cy="50%" r="100%">
+        <stop offset="0%" stop-color="#ffe87a" stop-opacity="0.75"/>
+        <stop offset="70%" stop-color="#ffe87a" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#ffe87a" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+
+    <g id="sub-group">
+      <polygon id="sub-beam" points="150,50 212,18 212,82" fill="url(#beamGlow)" opacity="0"></polygon>
+      <ellipse cx="85" cy="52" rx="63" ry="24" fill="url(#subBody)"></ellipse>
+      <ellipse cx="85" cy="56" rx="61" ry="17" fill="rgba(96,73,9,0.16)"></ellipse>
+      <ellipse cx="85" cy="52" rx="63" ry="24" fill="none" stroke="#8e6f17" stroke-width="1.8" opacity="0.46"></ellipse>
+
+      <path d="M57 26 C 61 18, 77 14, 92 17 C 102 19, 112 24, 116 31 L 57 31 Z" fill="#bf9a2d"></path>
+      <rect x="61" y="24" width="42" height="18" rx="7" fill="#ba9528"></rect>
+      <rect x="61" y="24" width="42" height="18" rx="7" fill="none" stroke="#89691a" stroke-width="1.2" opacity="0.45"></rect>
+      <rect x="74" y="10" width="4" height="16" rx="2" fill="#8f7318"></rect>
+      <rect x="70" y="10" width="12" height="4" rx="2" fill="#8f7318"></rect>
+      <rect x="83" y="12" width="2.6" height="12" rx="1.3" fill="#8f7318" opacity="0.76"></rect>
+
+      <ellipse cx="28" cy="51" rx="8" ry="14" fill="#b58f22"></ellipse>
+      <rect x="18" y="49" width="14" height="5" rx="2.5" fill="#957716"></rect>
+      <ellipse cx="22" cy="43" rx="4.5" ry="8" fill="#b58f22" opacity="0.72"></ellipse>
+      <ellipse cx="22" cy="59" rx="4.5" ry="8" fill="#b58f22" opacity="0.72"></ellipse>
+
+      <ellipse cx="145" cy="52" rx="8" ry="12" fill="#b99224"></ellipse>
+      <circle cx="149" cy="52" r="7.2" fill="#ffd95a" opacity="0.94" id="sub-headlight"></circle>
+      <circle cx="149" cy="52" r="3.5" fill="#fff7bc"></circle>
+
+      <circle cx="96" cy="52" r="8" fill="#2e6080"></circle>
+      <circle cx="96" cy="52" r="5.2" fill="#183f59"></circle>
+      <circle cx="96" cy="52" r="2.7" fill="#5ea4c8" opacity="0.6"></circle>
+
+      <circle cx="67" cy="52" r="6.2" fill="#2e6080"></circle>
+      <circle cx="67" cy="52" r="4.2" fill="#183f59"></circle>
+      <circle cx="67" cy="52" r="2.1" fill="#5ea4c8" opacity="0.56"></circle>
+
+      <path d="M42 36 Q 87 18 132 34" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="3" stroke-linecap="round"></path>
+      <ellipse cx="86" cy="46" rx="50" ry="11" fill="url(#subShadow)" opacity="0.7"></ellipse>
+
+      <circle cx="46" cy="45" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
+      <circle cx="46" cy="59" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
+      <circle cx="116" cy="45" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
+      <circle cx="116" cy="59" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
+    </g>
+  </svg>
