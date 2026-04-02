@@ -1272,15 +1272,30 @@
       let tEnd = sandSurfaceY - subHNow / 2;
 
       tStart = Math.max(marginTop, Math.min(tStart, layoutVH - subHNow - marginBottom));
-      tEnd = Math.max(marginTop, Math.min(tEnd, layoutVH - subHNow - marginBottom));
-
-      if (tEnd < tStart + 8) tEnd = Math.min(tStart + 8, layoutVH - subHNow - marginBottom);
-
+      // FIX 1
+      // tEnd = Math.max(marginTop, Math.min(tEnd, layoutVH - subHNow - marginBottom));
+      // if (tEnd < tStart + 8) tEnd = Math.min(tStart + 8, layoutVH - subHNow - marginBottom);
+      tEnd = Math.max(marginTop, tEnd);
+      if (tEnd < tStart + 8) tEnd = tStart + 8;
+      
       let baseTop = tStart + p * (tEnd - tStart);
-      baseTop = Math.max(marginTop, Math.min(baseTop, layoutVH - subHNow - marginBottom));
+      // FIX 2
+      // baseTop = Math.max(marginTop, Math.min(baseTop, layoutVH - subHNow - marginBottom));
+      baseTop = Math.max(marginTop, baseTop);
 
       /* Visual viewport offset: fixed is layout-relative; offset tracks rubber-band overscroll */
-      sub.style.top = baseTop + vvOffsetTop + 'px';
+      // FIX 3
+      // sub.style.top = baseTop + vvOffsetTop + 'px';
+
+      if (p >= 0.999) {
+        sub.style.position = 'absolute';
+        // Convert the viewport 'baseTop' coordinate to a document-relative Y coordinate
+        sub.style.top = (baseTop + window.scrollY) + 'px';
+      } else {
+        // While scrolling normally, keep it fixed to the screen for a smooth transition
+        sub.style.position = 'fixed';
+        sub.style.top = baseTop + vvOffsetTop + 'px';
+      }
     }
 
     requestAnimationFrame(animateOcean);
