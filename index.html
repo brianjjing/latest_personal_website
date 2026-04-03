@@ -338,7 +338,7 @@
       position: fixed;
       left: 3vw;
       z-index: 8;
-      width: clamp(126px, 12vw, 168px);
+      width: 12vw;
       /* top is driven every frame in JS; a CSS transition here fights rAF and causes jitter */
       pointer-events: none;
       transform-origin: 42% 52%;
@@ -507,8 +507,10 @@
       --entry-body-gap: clamp(10px, 1.15vw, 14px);
       position: relative;
       z-index: 1;
-      margin-left: 165px;
-      width: calc(100% - 165px - 28px);
+      width: 60vw;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
       background: linear-gradient(
         155deg,
         rgba(255, 255, 255, 0.1) 0%,
@@ -705,8 +707,6 @@
       #navbar { gap: 10px; padding-top: 12px; flex-wrap: wrap; }
       #hero-text { width: min(700px, 88vw); top: 36%; }
       .entry-card {
-        margin-left: 96px;
-        width: calc(100% - 96px - 20px);
         column-gap: 16px;
       }
       #submarine { width: clamp(112px, 26vw, 144px); left: 2.5vw; }
@@ -731,8 +731,6 @@
         transform: translate(-50%, 50%);
       }
       .entry-card {
-        margin-left: 28px;
-        width: calc(100% - 28px);
         padding: 16px 18px;
       }
       #hero-text h1 { font-size: clamp(2rem, 8vw, 3rem); }
@@ -926,7 +924,6 @@
       <ul class="entry-responsibilities">
         <li>Developed an interactive interface with a pump-level sequence simulator, displaying trajectories of 12 cardiovascular features over 6-hour treatment sequence windows</li>
         <li>Displayed physician-interpretable RL evaluation metrics for weaning sequences to support clinician decision-making</li>
-        <li>Aimed for implementation into the Impella device, used by 50,000+ US patients</li>
       </ul>
       <a class="entry-view-link" href="https://github.com/brianjjing/impella_better_ui">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
