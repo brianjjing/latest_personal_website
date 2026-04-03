@@ -339,6 +339,9 @@
       left: 3vw;
       z-index: 8;
       width: 12vw;
+      /* Match SVG viewBox 180×96 so layout height stays locked to width (stable rAF math). */
+      aspect-ratio: 180 / 96;
+      height: auto;
       /* top is driven every frame in JS; a CSS transition here fights rAF and causes jitter */
       pointer-events: none;
       transform-origin: 42% 52%;
@@ -346,7 +349,12 @@
       will-change: transform, top;
     }
 
-    #submarine svg { overflow: visible; }
+    #submarine svg {
+      overflow: visible;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
 
     #scroll-arrow {
       position: absolute;
@@ -505,6 +513,7 @@
 
     .entry-card {
       --entry-body-gap: clamp(10px, 1.15vw, 14px);
+      --entry-header-row-gap: clamp(2px, 0.7vw, 8px);
       position: relative;
       z-index: 1;
       width: 60vw;
@@ -526,15 +535,26 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       grid-template-areas:
-        "title date"
-        "role location"
+        "title meta"
+        "role meta"
         "body body";
       column-gap: clamp(14px, 3vw, 28px);
-      row-gap: clamp(2px, 0.7vw, 8px);
+      row-gap: var(--entry-header-row-gap);
       align-items: start;
     }
 
+    .entry-meta {
+      grid-area: meta;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: flex-start;
+      gap: var(--entry-header-row-gap);
+      min-width: 0;
+    }
+
     .entry-title,
+    .entry-meta,
     .entry-date,
     .entry-role,
     .entry-location,
@@ -562,11 +582,11 @@
       line-height: 1.15;
       letter-spacing: -0.01em;
       color: #d5eeff;
-      align-self: end;
+      /* start: keeps date beside first line when title wraps (end packed both to row bottom). */
+      align-self: start;
     }
 
     .entry-date {
-      grid-area: date;
       font-size: clamp(0.72rem, 0.66rem + 0.28vw, 0.86rem);
       font-weight: 600;
       line-height: 1.2;
@@ -575,7 +595,7 @@
       text-align: right;
       white-space: nowrap;
       color: #d6eeff;
-      align-self: end;
+      align-self: start;
     }
 
     .entry-role {
@@ -590,7 +610,6 @@
     }
 
     .entry-location {
-      grid-area: location;
       font-size: clamp(0.7rem, 0.64rem + 0.26vw, 0.82rem);
       font-weight: 500;
       line-height: 1.3;
@@ -709,7 +728,7 @@
       .entry-card {
         column-gap: 16px;
       }
-      #submarine { width: clamp(112px, 26vw, 144px); left: 2.5vw; }
+      #submarine { width: 26vw; left: 2.5vw; }
       .floor-contact { gap: 20px; font-size: 0.7rem; }
     }
 
@@ -747,11 +766,15 @@
         grid-template-columns: 1fr;
         grid-template-areas:
           "title"
+          "meta"
           "role"
-          "date"
-          "location"
           "body";
-        row-gap: 4px;
+        --entry-header-row-gap: 4px;
+        row-gap: var(--entry-header-row-gap);
+      }
+
+      .entry-meta {
+        align-items: flex-start;
       }
 
       .entry-date,
@@ -770,11 +793,11 @@
 <body>
 
 <nav id="navbar">
-  <a class="cloud-link" href="https://www.linkedin.com/in/brian-jing/"  target="_blank"><span class="cloud-link-label">LinkedIn</span></a>
-  <a class="cloud-link" href="https://drive.google.com/file/d/1Zu67D0MsTx_-hEqcfjhemuDfn6Olpk-I/view?usp=sharing" target="_blank"><span class="cloud-link-label">Resume</span></a>
-  <a class="cloud-link" href="https://github.com/brianjjing" target="_blank"><span class="cloud-link-label">GitHub</span></a>
-  <a class="cloud-link" href="https://www.kaggle.com/brianjing" target="_blank"><span class="cloud-link-label">Kaggle</span></a>
-  <a class="cloud-link" href="mailto:bjing@ucsd.edu"><span class="cloud-link-label">Contact</span></a>
+  <a class="cloud-link" href="https://www.linkedin.com/in/brian-jing/" target="_blank" rel="noopener noreferrer"><span class="cloud-link-label">LinkedIn</span></a>
+  <a class="cloud-link" href="https://drive.google.com/file/d/14Pf7hKEumm19a6dJDMozZYT2yxXJGJ6Y/view?usp=sharing" target="_blank" rel="noopener noreferrer"><span class="cloud-link-label">Resume</span></a>
+  <a class="cloud-link" href="https://github.com/brianjjing" target="_blank" rel="noopener noreferrer"><span class="cloud-link-label">GitHub</span></a>
+  <a class="cloud-link" href="https://www.kaggle.com/brianjing" target="_blank" rel="noopener noreferrer"><span class="cloud-link-label">Kaggle</span></a>
+  <a class="cloud-link" href="mailto:bjing@ucsd.edu" target="_blank" rel="noopener noreferrer"><span class="cloud-link-label">Contact</span></a>
 </nav>
 
 <section id="hero">
@@ -820,7 +843,7 @@
       UCSD Prof. Rose Yu's <em>Spatiotemporal ML Lab</em>, in order to display results obtained by the lab's 
       smart pumping algorithm for the Impella heart pumping device.
     </p>
-    <p class="scroll-cue">Curious about my projects? Scroll down to dive in ↓</p>
+    <p class="scroll-cue">Curious about my experience & projects? Scroll down to dive in ↓</p>
   </div>
 
   <div class="front-wave-wrap" id="front-wave-wrap" aria-hidden="true">
@@ -860,7 +883,7 @@
         <stop offset="0%" stop-color="rgba(255,255,255,0.26)"/>
         <stop offset="100%" stop-color="rgba(95,64,0,0.18)"/>
       </linearGradient>
-      <radialGradient id="beamGlow" cx="0%" cy="50%" r="100%">
+      <radialGradient id="beamGlow" cx="0%" cy="50%" r="140%">
         <stop offset="0%" stop-color="#ffe87a" stop-opacity="0.75"/>
         <stop offset="70%" stop-color="#ffe87a" stop-opacity="0.18"/>
         <stop offset="100%" stop-color="#ffe87a" stop-opacity="0"/>
@@ -868,7 +891,15 @@
     </defs>
 
     <g id="sub-group">
-      <polygon id="sub-beam" points="150,50 212,18 212,82" fill="url(#beamGlow)" opacity="0"></polygon>
+      <!-- Longer headlight cone with a softly curved tip; JS animates opacity on this path.
+           Beam length scales with viewport because #submarine uses vw width
+           and this SVG fills that box. -->
+      <path
+        id="sub-beam"
+        d="M150 50 L320 12 Q338 50 320 88 Z"
+        fill="url(#beamGlow)"
+        opacity="0"
+      ></path>
       <ellipse cx="85" cy="52" rx="63" ry="24" fill="url(#subBody)"></ellipse>
       <ellipse cx="85" cy="56" rx="61" ry="17" fill="rgba(96,73,9,0.16)"></ellipse>
       <ellipse cx="85" cy="52" rx="63" ry="24" fill="none" stroke="#8e6f17" stroke-width="1.8" opacity="0.46"></ellipse>
@@ -915,15 +946,17 @@
 
   <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">Rose Spatiotemporal ML Lab 🫀</div>
+    <div class="entry-meta">
+      <div class="entry-date">Feb 2026 – Present</div>
+      <div class="entry-location">La Jolla, CA</div>
+    </div>
     <div class="entry-role">Full-Stack AI Developer</div>
-    <div class="entry-location">La Jolla, CA</div>
-    <div class="entry-date">Feb 2026 – Present</div>
     <div class="entry-body">
-      <div class="entry-description">Developing a React + Python API physician-facing web app for the AI weaning (withdrawing strength over time) of a heart-pumping device. App displays metrics for this AI weaning algorithm, enabling physician evaluation of pump weaning sequences.
+      <div class="entry-description">Developing a React + Python API physician-facing web app for the AI gradual-support-reduction algorithm for heart-pumping devices.
       </div>
       <ul class="entry-responsibilities">
-        <li>Developed an interactive interface with a pump-level sequence simulator, displaying trajectories of 12 cardiovascular features over 6-hour treatment sequence windows</li>
-        <li>Displayed physician-interpretable RL evaluation metrics for weaning sequences to support clinician decision-making</li>
+        <li>Developed an interactive UI with a pump reduction sequence simulator, displaying 12 cardiovascular feature trajectories over 6-hour windows</li>
+        <li>Implemented physician-interpretable RL evaluation metrics for different support-reduction sequences to support clinician decision-making</li>
       </ul>
       <a class="entry-view-link" href="https://github.com/brianjjing/impella_better_ui">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
@@ -931,53 +964,55 @@
 
   <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">POWERCOACH 💪</div>
+    <div class="entry-meta">
+      <div class="entry-date">August 2024 – Present</div>
+      <div class="entry-location">La Jolla / Irvine, CA</div>
+    </div>
     <div class="entry-role">Founder, AI Engineer</div>
-    <div class="entry-location">La Jolla / Irvine, CA</div>
-    <div class="entry-date">August 2024 – Present</div>
     <div class="entry-body">
-      <div class="entry-description">Building a real-time mobile lifting form correction app to help lifters avoid injuries, 
-        targeted for home gymmers without a gym bro.</div>
+      <div class="entry-description">Building a real-time mobile lifting form correction app to help home gymmers without gym buddies avoid injuries.</div>
       <ul class="entry-responsibilities">
-        <li>Engineering a PyTorch neural network pipeline using spatiotemporal data sequences
-          to classify form errors for smartphone footage of 10 common powerlifting exercises</li>
-        <li>Built a data pipeline to extract clips from USA Powerlifting footage, converting ∼10 video hours 
-          to 25,000+ tabular, frame-level data points for threshold-based fault detection training</li>
-        <li>Developed a real-time app using Flask and WebSockets, delivering low-latency audiovisual
-          feedback to the React frontend through JPEG compression and payload minimization</li>
+        <li>Engineering a PyTorch neural network using sliding-window inputs
+          to find form errors in phone footage of 10 powerlifting exercises</li>
+        <li>Built a data pipeline to convert 10 hours of powerlifting meet footage 
+          into 25,000+ tabular, frame-level data points for form fault detection training</li>
+        <li>Delivered low-latency audiovisual feedback to the React frontend through JPEG compression and payload minimization</li>
       </ul>
       <a class="entry-view-link" href="https://apps.apple.com/us/app/pwrcch/id6751323312">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
   </div></div>
 
   <div class="timeline-entry"><div class="entry-card">
-    <div class="entry-title">AIBRT 🧠</div>
+    <div class="entry-title">American Institute for Behavioral<br> Research & Tech 🧠</div>
+    <div class="entry-meta">
+      <div class="entry-date">Feb 2026 – Mar 2026</div>
+      <div class="entry-location">La Jolla, CA</div>
+    </div>
     <div class="entry-role">Software Engineer Intern</div>
-    <div class="entry-location">La Jolla, CA</div>
-    <div class="entry-date">Feb 2026 – Mar 2026</div>
     <div class="entry-body">
-      <div class="entry-description">Built a game to prove Dr. Robert Epstein's Generativity Theory (GT), for his American Institute for Behavioral Research & Tech (AIBRT). GT involves equations predicting human behavior during a problem, and equations are validated by their prediciton of player actions.</div>
+      <div class="entry-description">Built a game to prove Dr. Robert Epstein's Generativity Theory, which involves equations predicting human behavior during a problem. Validated equations by accuracy of prediciton of player actions.</div>
       <ul class="entry-responsibilities">
-        <li>Built a real-time Python game environment, paired with an experimenter view displaying dynamic GT predictors alongside player actions for live model validation</li>
-        <li>Designed a SQLite data pipeline to log actions for theory validation, restructuring legacy schema into a lighter, normalized database architecture with improved data integrity</li>
-        <li>Compressed legacy code space to less than 50% its original size while preserving all functionality, improving system performance and maintainability</li>
+        <li>Paired the game with an experimenter view displaying equation predictions alongside player actions for live validation</li>
+        <li>Designed a SQLite action logging pipeline, restructuring legacy schema into a lighter, normalized architecture</li>
+        <li>Compressed legacy code space to under 50% its original size while preserving all functionality, improving system performance and maintainability</li>
       </ul>
       <a class="entry-view-link" href="https://github.com/brianjjing/GT-Codebase">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
   </div></div>
 
   <div class="timeline-entry"><div class="entry-card">
-    <div class="entry-title">Eclipse Analytics 🏀</div>
+    <div class="entry-title">Eclipse Analytics UCSD 🏀</div>
+    <div class="entry-meta">
+      <div class="entry-date">Oct 2025 - Mar 2026</div>
+      <div class="entry-location">La Jolla, CA</div>
+    </div>
     <div class="entry-role">ML Project Manager, Data Science Consultant</div>
-    <div class="entry-location">La Jolla, CA</div>
-    <div class="entry-date">Oct 2025 - Mar 2026</div>
     <div class="entry-body">
-      <div class="entry-description">UCSD sports analytics club where I first led a project to find the most clutch NBA player (Fall 2025). Then, I worked on developing the club's consulting team's basketball player tracking model, for analyzing UCSD Men's Basketball performance (Winter 2026).</div>
+      <div class="entry-description">Sports analytics club where I first led a project finding the most clutch NBA player (Fall 2025). Then, I worked on the consulting team's player tracking model for analyzing UCSD Men's Basketball performance (Winter 2026).</div>
       <ul class="entry-responsibilities">
-        <li>Fine-tuned Meta’s SAM 2 model for continuous basketball player tracking through player overlap and frame cuts,
-          leveraging number recognition and distance from court keypoints</li>
-        <li>Led 3 sports analysts to build a PCA + Ridge Regression stacking ensemble, reduced 30+ 
+        <li>Fine-tuned Meta’s SAM 2 to re-identify players after tracking loss, ensuring accurate analytics for UCSD basketball consulting</li>
+        <li>Led a PCA + Ridge Regression stacking ensemble project, reducing 30+ 
           game features to 1 “clutchness” score for 700+ NBA players while retaining 82% variance</li>
-        <li>Aggregated clutch-time usage rates, scoring impact, and performance under pressure to engineered a clutch-time “game changer” meta-feature used in PCA</li>
       </ul>
       <a class="entry-view-link" href="https://github.com/brianjjing/what-makes-a-clutch-player">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
@@ -985,15 +1020,17 @@
 
   <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">BFRB Gesture Classification 👋</div>
+    <div class="entry-meta">
+      <div class="entry-date">Jun 2025 – Sep 2025</div>
+      <div class="entry-location">Irvine, CA</div>
+    </div>
     <div class="entry-role">Independent Project</div>
-    <div class="entry-location">Irvine, CA</div>
-    <div class="entry-date">Jun 2025 – Sep 2025</div>
     <div class="entry-body">
-      <div class="entry-description">Built an XGBoost + PyTorch pipeline to classify different body-focused repetitive behaviors (BFRBs) based on wrist-worn sensor data, for a Kaggle competition.</div>
+      <div class="entry-description">Built an XGBoost + PyTorch pipeline to classify body-focused repetitive behaviors from wrist-worn sensor data.</div>
       <ul class="entry-responsibilities">
         <li>Performed multivariate imputation on 30,000+ missing data entries, preserving imputed feature variance through Bayesian optimization of imputation hyperparameters</li>
-        <li>Reduced 300 of the dataset’s redundant raw sensor variables to 25 statistical features, boosting training efficiency while maintaining classification accuracy </li>
-        <li>Improved testing F1 score by ∼40% using 5-fold cross validation</li>
+        <li>Reduced 300 redundant raw sensor variables to 25 statistical features, boosting training efficiency while maintaining accuracy </li>
+        <li>Improved testing F1 score by ∼40% with 5-fold cross validation</li>
       </ul>
       <a class="entry-view-link" href=https://www.kaggle.com/code/brianjing/child-mind-institute-bfrb?scriptVersionId=289645396">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
@@ -1001,15 +1038,17 @@
 
   <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">X-Ray Tuberculosis Detector 🦠</div>
+    <div class="entry-meta">
+      <div class="entry-date">Jun 2024 – Jul 2024</div>
+      <div class="entry-location">Irvine, CA</div>
+    </div>
     <div class="entry-role">Independent Project</div>
-    <div class="entry-location">Irvine, CA</div>
-    <div class="entry-date">Jun 2024 – Jul 2024</div>
     <div class="entry-body">
       <div class="entry-description">My first project with computer vision, where I trained a Keras CNN to diagnose tuberculosis from chest X-rays.</div>
       <ul class="entry-responsibilities">
-        <li>Achieved 98% testing accuracy for a Keras CNN on binary classification of 4,200+ images through Adam optimization and ReduceLROnPlateau</li>
-        <li>Open-sourced the model architecture on kaggle, calling on 2,000+ viewers to
-          develop it further and inspiring deeper exploration into computer vision innovations in healthcare</li>
+        <li>Achieved 98% testing accuracy on binary classification of 4,200+ images using Adam optimization and ReduceLROnPlateau</li>
+        <li>Open-sourced the architecture on Kaggle, calling on 2,000+ viewers to
+          develop it further</li>
       </ul>
       <a class="entry-view-link" href="https://www.kaggle.com/code/brianjing/tuberculosis-x-ray-diagnosis-cnn-classifier">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
@@ -1017,18 +1056,18 @@
 
   <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">Ignited Minds Nonprofit 💡</div>
+    <div class="entry-meta">
+      <div class="entry-date">Jul 2023 – Apr 2024</div>
+      <div class="entry-location">Irvine, CA</div>
+    </div>
     <div class="entry-role">Data Science Lead</div>
-    <div class="entry-location">Irvine, CA / Remote in Malawi</div>
-    <div class="entry-date">Jul 2023 – Apr 2024</div>
     <div class="entry-body">
-      <div class="entry-description">Cofounded a nonprofit organization to provide Malawian high schools with funding and specialized STEM education.</div>
+      <div class="entry-description">Cofounded a nonprofit providing Malawian high schools with specialized STEM education.</div>
       <ul class="entry-responsibilities">
-        <li>Designed and taught the first data science curriculum for 11 Malawian high schools remotely, coordinating
-          technical infrastructure funding with local administrators</li>
-        <li>Iteratively enhanced teaching methods based on class participation metrics, fostering engaging learning
-          environments for introducing foundational Python and R skills to beginners</li>
-        <li>Grew a global online community of 1,000+ aspiring analysts through monthly follow-along blogs covering data science concepts and
-          technologies</li>
+        <li>Designed and taught the first data science curriculum for 11 Malawian high schools remotely</li>
+        <li>Enhanced teaching methods based on participation metrics, fostering engaging learning
+          environments for teaching foundational Python and R skills</li>
+        <li>Built a global online community of 1,000+ analysts through monthly follow-along data science blogs</li>
       </ul>
       <a class="entry-view-link" href="https://ignitedmindsusa.org/">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
@@ -1036,15 +1075,16 @@
 
   <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">UC Irvine ICS Summer Academy 🐜🍴</div>
+    <div class="entry-meta">
+      <div class="entry-date">Jun 2023 – Jul 2023</div>
+      <div class="entry-location">Irvine, CA</div>
+    </div>
     <div class="entry-role">Academic Fellow</div>
-    <div class="entry-location">Irvine, CA</div>
-    <div class="entry-date">Jun 2023 – Jul 2023</div>
     <div class="entry-body">
-      <div class="entry-description">Collaboratively built an Alzheimer's cognitive impairment level prediction pipeline using R at UCI's Information & Computer Sciences (ICS) Summer Academy. Began my data science journey with this project, continuing my theme of healthcare-themed projects throughout high school, all visible on my Kaggle.</div>
+      <div class="entry-description">Built an Alzheimer's prediction pipeline using R at UCI's Information & Computer Sciences Summer Academy. Began data science with this project, putting the rest of my healthcare-themed projects on my Kaggle.</div>
       <ul class="entry-responsibilities">
-        <li>Reduced 15 neuroanatomical features to 5 predictors through multinomial LASSO feature selection, inputting them into a Random Forest classifier to achieve 90% binary Alzheimer's classification accuracy</li>
-        <li>Designed a threshold-based probabilistic diagnosis system to optimize the confidence-conclusiveness tradeoff, achieving 93% multiclass accuracy with a 90% confidence threshold</li>
-        <li>Performed extensive filtering and feature encoding on a clinical dataset of 2,700 patients × 57 biomarker features</li>
+        <li>Extracted the 5 best predictors from 15 neuroanatomical features using LASSO, inputting them into Random Forest to achieve 90% binary Alzheimer's classification accuracy</li>
+        <li>Designed a threshold-based severity-level diagnosis system, achieving 93% multiclass accuracy with a 90% confidence threshold</li>
       </ul>
       <a class="entry-view-link" href="https://www.kaggle.com/code/brianjing/alzheimer-s-detection-model-using-r">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
@@ -1107,6 +1147,8 @@
   let thirdTop = null;
   let subDepthTarget = 0;
   let subDepthSmoothed = 0;
+  /** Smoothed hull height for dive math (avoids 1px vw/layout jitter vs fixed-size clamp). */
+  let subHSmooth = 70;
 
   function clamp01(x) { return Math.max(0, Math.min(1, x)); }
   function lerp(a, b, t) { return a + (b - a) * t; }
@@ -1144,7 +1186,10 @@
     const syNow = window.scrollY;
     const hHNow = hero ? hero.offsetHeight : 0;
     const inHeroPhase = syNow < hHNow;
-    const subHNow = sub ? (sub.offsetHeight || 70) : 70;
+    const subW = sub && sub.offsetWidth ? sub.offsetWidth : 0;
+    const subHRaw = subW > 0 ? subW * (96 / 180) : 70;
+    subHSmooth += (subHRaw - subHSmooth) * 0.22;
+    const subHNow = subHSmooth;
     const layoutVH = visualViewport ? visualViewport.height : window.innerHeight;
     const vvOffsetTop = visualViewport ? visualViewport.offsetTop : 0;
     const marginTop = 80;
@@ -1218,7 +1263,7 @@
       const omegaIdle = lerp(OMEGA_FAST, OMEGA_SLOW, d);
       const bobIdle = Math.sin(t * omegaIdle + 0.75) * lerp(4, 2.2, d);
       const rotIdle = Math.sin(t * omegaIdle + 2.1) * lerp(1.4, 0.55, d);
-      sub.style.transform = `translate(0, ${bobIdle}px) rotate(${rotIdle}deg)`;
+      sub.style.transform = `translate3d(0, ${bobIdle}px, 0) rotate(${rotIdle}deg)`;
 
       /* Timeline .water-bg parallax removed: translateY caused horizontal seams vs neighbors */
       if (waterBg) waterBg.style.transform = '';
@@ -1257,7 +1302,7 @@
       const timelineR = timeline.getBoundingClientRect();
       const floorR = oceanFloor.getBoundingClientRect();
 
-      let tStart = heroR.top + heroR.height * 0.80 - 42;
+      let tStart = heroR.top + heroR.height * 0.80 - subHNow * 0.5;
       // if (heroR.bottom < subHNow + 48) {
       //   tStart = timelineR.top + Math.min(28, Math.max(12, timelineR.height * 0.035));
       // }
@@ -1284,7 +1329,7 @@
       if (syNow <= 0) {
         // Top overscroll: Lock to the exact document coordinate of the water line
         sub.style.position = 'absolute';
-        sub.style.top = (hero.offsetHeight * 0.80 - 42) + 'px';
+        sub.style.top = (hero.offsetHeight * 0.80 - subHNow * 0.5) + 'px';
       } else if (syNow >= scrollMax) {
         // Bottom overscroll: Lock to the exact document coordinate of the sand
         sub.style.position = 'absolute';
