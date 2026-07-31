@@ -1,57 +1,58 @@
 <svg viewBox="0 0 180 96" xmlns="http://www.w3.org/2000/svg" style="width:100%">
-    <defs>
-      <linearGradient id="subBody" x1="0" x2="1">
-        <stop offset="0%" stop-color="#caa73d"/>
-        <stop offset="55%" stop-color="#dfbf58"/>
-        <stop offset="100%" stop-color="#ae881c"/>
-      </linearGradient>
-      <linearGradient id="subShadow" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stop-color="rgba(255,255,255,0.26)"/>
-        <stop offset="100%" stop-color="rgba(95,64,0,0.18)"/>
-      </linearGradient>
-      <radialGradient id="beamGlow" cx="0%" cy="50%" r="100%">
-        <stop offset="0%" stop-color="#ffe87a" stop-opacity="0.75"/>
-        <stop offset="70%" stop-color="#ffe87a" stop-opacity="0.18"/>
-        <stop offset="100%" stop-color="#ffe87a" stop-opacity="0"/>
-      </radialGradient>
-    </defs>
+  <!-- The site's mascot, at 16px. Same viewBox, same silhouette and the same
+       paint ramp as the inline submersible in index.html, with everything
+       that would land under one pixel taken out: no seams, no grime, no
+       specular, one lamp, flat glass.
 
-    <g id="sub-group">
-      <polygon id="sub-beam" points="150,50 212,18 212,82" fill="url(#beamGlow)" opacity="0"></polygon>
-      <ellipse cx="85" cy="52" rx="63" ry="24" fill="url(#subBody)"></ellipse>
-      <ellipse cx="85" cy="56" rx="61" ry="17" fill="rgba(96,73,9,0.16)"></ellipse>
-      <ellipse cx="85" cy="52" rx="63" ry="24" fill="none" stroke="#8e6f17" stroke-width="1.8" opacity="0.46"></ellipse>
+       Colours are literal sRGB here and not var() references to the sub
+       tokens, on purpose. A favicon is rendered as a standalone document
+       with no page to inherit custom properties from, so a var() reference
+       would resolve to nothing and paint black. These are the same tokens,
+       converted once. If the hull palette in index.html moves, move these
+       with it. -->
+  <defs>
+    <linearGradient id="paint" gradientUnits="userSpaceOnUse" x1="0" y1="27.5" x2="0" y2="77">
+      <stop offset="0" stop-color="#f5eac1"/>
+      <stop offset="0.08" stop-color="#eace66"/>
+      <stop offset="0.42" stop-color="#cfac30"/>
+      <stop offset="0.66" stop-color="#9e7e34"/>
+      <stop offset="0.84" stop-color="#56442c"/>
+      <stop offset="1" stop-color="#11202b"/>
+    </linearGradient>
+    <linearGradient id="sail" gradientUnits="userSpaceOnUse" x1="0" y1="15.5" x2="0" y2="33">
+      <stop offset="0" stop-color="#eace66"/>
+      <stop offset="0.5" stop-color="#cfac30"/>
+      <stop offset="1" stop-color="#9e7e34"/>
+    </linearGradient>
+    <linearGradient id="metal" gradientUnits="userSpaceOnUse" x1="0" y1="26" x2="0" y2="84">
+      <stop offset="0" stop-color="#626a72"/>
+      <stop offset="0.62" stop-color="#1d2228"/>
+      <stop offset="1" stop-color="#1d2228"/>
+    </linearGradient>
+  </defs>
 
-      <path d="M57 26 C 61 18, 77 14, 92 17 C 102 19, 112 24, 116 31 L 57 31 Z" fill="#bf9a2d"></path>
-      <rect x="61" y="24" width="42" height="18" rx="7" fill="#ba9528"></rect>
-      <rect x="61" y="24" width="42" height="18" rx="7" fill="none" stroke="#89691a" stroke-width="1.2" opacity="0.45"></rect>
-      <rect x="74" y="10" width="4" height="16" rx="2" fill="#8f7318"></rect>
-      <rect x="70" y="10" width="12" height="4" rx="2" fill="#8f7318"></rect>
-      <rect x="83" y="12" width="2.6" height="12" rx="1.3" fill="#8f7318" opacity="0.76"></rect>
+  <!-- skid frame, tail fins, thruster shroud -->
+  <path d="M63 79.2h50v2.6H63ZM68.6 70.8h2.9L68 80h-2.9ZM105.4 70L108.3 70L111.6 80h-2.9Z" fill="url(#metal)"/>
+  <path d="M38 40L25.6 26.6L21.6 28.8L30 42ZM38 64L25.6 77.4L21.6 75.2L30 62ZM17 49.4h10v5.2H17Z" fill="url(#metal)"/>
+  <ellipse cx="15.4" cy="52" rx="4.6" ry="10.6" fill="url(#metal)"/>
+  <ellipse cx="16.2" cy="52" rx="2.9" ry="8.4" fill="#000103"/>
 
-      <ellipse cx="28" cy="51" rx="8" ry="14" fill="#b58f22"></ellipse>
-      <rect x="18" y="49" width="14" height="5" rx="2.5" fill="#957716"></rect>
-      <ellipse cx="22" cy="43" rx="4.5" ry="8" fill="#b58f22" opacity="0.72"></ellipse>
-      <ellipse cx="22" cy="59" rx="4.5" ry="8" fill="#b58f22" opacity="0.72"></ellipse>
+  <!-- mast and sail -->
+  <path d="M76.4 7.2h3v12.6h-3ZM72.4 7.4h11v2.6h-11Z" fill="url(#metal)"/>
+  <path d="M58.6 31.8C59.6 25.2 63.8 20.2 71.2 18C79 15.7 92 15.8 100 18.2C108 20.6 112.6 25.8 113.6 31.8Z" fill="url(#sail)"/>
 
-      <ellipse cx="145" cy="52" rx="8" ry="12" fill="#b99224"></ellipse>
-      <circle cx="149" cy="52" r="7.2" fill="#ffd95a" opacity="0.94" id="sub-headlight"></circle>
-      <circle cx="149" cy="52" r="3.5" fill="#fff7bc"></circle>
+  <!-- hull -->
+  <path d="M22.5 52C24.4 41.2 37.2 31.6 60 29.7C82 27.9 111 29.3 129 33.7C141 36.6 149.5 43.5 150.6 52C149.5 60.5 141 67.4 129 70.3C111 74.7 82 76.1 60 74.3C37.2 72.4 24.4 62.8 22.5 52Z" fill="url(#paint)"/>
 
-      <circle cx="96" cy="52" r="8" fill="#2e6080"></circle>
-      <circle cx="96" cy="52" r="5.2" fill="#183f59"></circle>
-      <circle cx="96" cy="52" r="2.7" fill="#5ea4c8" opacity="0.6"></circle>
+  <!-- viewports -->
+  <circle cx="97" cy="51" r="8.4" fill="url(#metal)"/>
+  <circle cx="97" cy="51" r="6.4" fill="#03101a"/>
+  <circle cx="68" cy="51.5" r="6.4" fill="url(#metal)"/>
+  <circle cx="68" cy="51.5" r="4.7" fill="#03101a"/>
 
-      <circle cx="67" cy="52" r="6.2" fill="#2e6080"></circle>
-      <circle cx="67" cy="52" r="4.2" fill="#183f59"></circle>
-      <circle cx="67" cy="52" r="2.1" fill="#5ea4c8" opacity="0.56"></circle>
-
-      <path d="M42 36 Q 87 18 132 34" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="3" stroke-linecap="round"></path>
-      <ellipse cx="86" cy="46" rx="50" ry="11" fill="url(#subShadow)" opacity="0.7"></ellipse>
-
-      <circle cx="46" cy="45" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
-      <circle cx="46" cy="59" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
-      <circle cx="116" cy="45" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
-      <circle cx="116" cy="59" r="1.35" fill="#8b6b17" opacity="0.52"></circle>
-    </g>
-  </svg>
+  <!-- lamp -->
+  <path d="M136.4 47.6C136.4 45.8 137.6 45 139.4 45h9.6v14h-9.6c-1.8 0-3-0.8-3-2.6Z" fill="url(#metal)"/>
+  <circle cx="150.2" cy="52" r="6.9" fill="#1d2228"/>
+  <circle cx="150.4" cy="52" r="4.7" fill="#fdcf6f"/>
+  <circle cx="150.8" cy="51.6" r="1.9" fill="#fffbd9"/>
+</svg>

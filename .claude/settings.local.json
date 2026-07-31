@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://api.github.com/repos/affaan-m/ECC/contents/skills/architecture-decision-records\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl *)",
+      "WebFetch(domain:skillsmp.com)",
+      "Bash(python3 -c ' *)",
+      "Bash(echo \"=== exit code \\($?\\) ===\")"
+    ]
+  }
+}
