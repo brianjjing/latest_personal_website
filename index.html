@@ -943,12 +943,33 @@
   <div class="timeline-line"></div>
 
   <div class="timeline-entry"><div class="entry-card">
+    <div class="entry-title">Wedge (YC S25)</div>
+    <div class="entry-meta">
+      <div class="entry-location">Chula Vista, CA</div>
+      <div class="entry-date">July 2026 – Present</div>
+    </div>
+    <div class="entry-role">AI Engineering Intern</div>
+    <div class="entry-body">
+      <div class="entry-description">Building an automated front desk and insurance eligibility checking system for a HealthTech startup.
+      </div>
+      <ul class="entry-responsibilities">
+        <!-- <li>Orchestrated a RAG pipeline of speech transcription, LLM intent routing, SQL retrieval, and emotional TTS over a single WebSocket</li> -->
+        <!-- <li>Co-located the LLM, speech recognition, and TTS functionalities on a 32 GB GPU using NVFP4 quantizationand per-process VRAM budgeting, delivering first responses in &lt;1s and cached follow-up answers in &lt;500ms</li> -->
+        <!-- <li>Defended the agent’s email summarization against prompt-injection attacks with Unicode normalization, regex pattern detection, untrusted data framing, and end-to-end UI email card security tests</li> -->
+         <li>Cut median insurance eligibility check latency in an AI healthcare front desk system from >40s to 1.7s for 20 insurance carriers, by migrating checks from RPA browser automation to compliant API calls for 8 different portals</li>
+         <li>Shipped a PDF translation gate to fix broken consent documents for non-English patients, fixing 63 broken fields for foreign language forms using key parity, encodability, and English-leakage check</li>
+         <li>Integrated Supabase audit logs into 2 production apps, exposing a patient insurance-verification PDF write failure</li>
+      </ul>
+    </div>
+  </div></div>
+
+  <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">Site Planner</div>
     <div class="entry-meta">
       <div class="entry-location">Irvine, CA</div>
       <div class="entry-date">June 2026 – Present</div>
     </div>
-    <div class="entry-role">Founding AI Engineer</div>
+    <div class="entry-role">Founding Engineer</div>
     <div class="entry-body">
       <div class="entry-description">Building an app that allows architectures to generate editable, compliant site plans from natural language and inputted specifications.
       </div>
@@ -961,38 +982,19 @@
   </div></div>
 
   <div class="timeline-entry"><div class="entry-card">
-    <div class="entry-title">Rose Spatiotemporal ML Lab</div>
-    <div class="entry-meta">
-      <div class="entry-location">La Jolla, CA</div>
-      <div class="entry-date">June 2026 – Present</div>
-    </div>
-    <div class="entry-role">ML Research Intern</div>
-    <div class="entry-body">
-      <div class="entry-description">Developing GORMPO, an offline reinforcement learning algorithm with model-based OOD regularization. Stands for Generative OOD-regularized Model-based Policy Optimization.
-      </div>
-      <ul class="entry-responsibilities">
-        <li>Architected a PyTorch benchmarking pipeline for GORMPO, an offline reinforcement learning algorithm
-          for heart-pumping devices, proving clinical outperformance of 2 state-of-the-art baselines for a NeurIPS submission</li>
-      </ul>
-      <a class="entry-view-link" href="https://arxiv.org/abs/2605.24405">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
-    </div>
-  </div></div>
-
-  <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">Project Seishin</div>
     <div class="entry-meta">
       <div class="entry-location">La Jolla, CA</div>
       <div class="entry-date">April 2026 – Present</div>
     </div>
-    <div class="entry-role">Founding AI Engineer</div>
+    <div class="entry-role">Founding Engineer</div>
     <div class="entry-body">
       <div class="entry-description">Built a vocal AI agent letting non-technical staff query company databases.
       </div>
       <ul class="entry-responsibilities">
-        <li>Orchestrated a RAG pipeline of speech transcription, LLM intent routing, SQL retrieval, and emotional TTS over a single WebSocket</li>
-        <li>Co-located LLM, speech recognition, and TTS functionalities on a 32GB GPU using weight and KV cache
-          quantization and per-process VRAM budgeting, achieving time-to-first-token speeds of ∼700ms</li>
-        <li>Defended the agent’s email summarization against prompt-injection attacks with Unicode normalization, regex pattern detection, untrusted data framing, and end-to-end UI email card security tests</li>
+        <li>Built a conversational AI agent letting non-technical staff query company databases, using 1 WebSocket to orchestrate a pipeline of speech transcription, intent classification, PostgreSQL retrieval, and emotional TTS</li>
+        <li>Achieved time-to-first-token speeds of 700ms by co-deploying LLM, speech recognition, and TTS to a 32GB GPU, using weight/KV-cache quantization and per-process VRAM budgeting</li>
+        <li>Defended the agent's email summarization against prompt-injection attacks with Unicode normalization, regex pattern detection, untrusted data framing, and end-to-end UI email card security tests</li>
       </ul>
     </div>
   </div></div>
@@ -1001,37 +1003,17 @@
     <div class="entry-title">Rose Spatiotemporal ML Lab</div>
     <div class="entry-meta">
       <div class="entry-location">La Jolla, CA</div>
-      <div class="entry-date">Feb 2026 – May 2026</div>
+      <div class="entry-date">February 2026 – Present</div>
     </div>
-    <div class="entry-role">Full-Stack AI Developer</div>
+    <div class="entry-role"> Machine Learning Researcher</div>
     <div class="entry-body">
-      <div class="entry-description">Developed a React + Python API physician-facing web app to run GORMPO simulations on support reduction sequences for heart-pumping devices (GORMPO explained on the top entry).
+      <div class="entry-description">Developing GORMPO, an offline reinforcement learning algorithm with model-based OOD regularization and extensive clinical applications. GORMPO = Generative OOD-regularized Model-based Policy Optimization.
       </div>
       <ul class="entry-responsibilities">
-        <li>Developed an interactive UI with a pump reduction sequence simulator, displaying 12 cardiovascular feature trajectories over 6-hour windows</li>
-        <li>Implemented physician-interpretable RL evaluation metrics for different support-reduction sequences to support clinician decision-making</li>
+        <li>Built a clinician trainee-facing application for simulating GORMPO pump-level reduction sequences of heart-pumping assistant devices on an 11,000+ patient database, projecting 6-hour trajectories of 12 heart health indicators</li>
+        <li>Architected a PyTorch benchmarking pipeline for GORMPO, proving clinical outperformance of 2 state-of-the-art baselines for a NeurIPS submission</li>
       </ul>
-      <a class="entry-view-link" href="https://github.com/brianjjing/impella_better_ui">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
-    </div>
-  </div></div>
-
-  <div class="timeline-entry"><div class="entry-card">
-    <div class="entry-title">POWERCOACH 💪</div>
-    <div class="entry-meta">
-      <div class="entry-location">La Jolla / Irvine, CA</div>
-      <div class="entry-date">August 2024 – Present</div>
-    </div>
-    <div class="entry-role">Founder, AI Engineer</div>
-    <div class="entry-body">
-      <div class="entry-description">Building a real-time mobile lifting form correction app to help home gymmers without gym buddies avoid injuries.</div>
-      <ul class="entry-responsibilities">
-        <li>Engineering a PyTorch neural network using sliding-window inputs
-          to find form errors in phone footage of 10 powerlifting exercises</li>
-        <li>Built a data pipeline to convert 10 hours of powerlifting meet footage 
-          into 25,000+ tabular, frame-level data points for form fault detection training</li>
-        <li>Delivered low-latency audiovisual feedback to the React frontend through JPEG compression and payload minimization</li>
-      </ul>
-      <a class="entry-view-link" href="https://apps.apple.com/us/app/pwrcch/id6751323312">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
+      <a class="entry-view-link" href="https://arxiv.org/abs/2605.24405">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
   </div></div>
 
@@ -1053,7 +1035,7 @@
       <a class="entry-view-link" href="https://github.com/brianjjing/GT-Codebase">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
   </div></div>
-
+  
   <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">Eclipse Analytics UCSD</div>
     <div class="entry-meta">
@@ -1069,6 +1051,26 @@
           game features to 1 “clutchness” score for 700+ NBA players while retaining 82% variance</li>
       </ul>
       <a class="entry-view-link" href="https://github.com/brianjjing/what-makes-a-clutch-player">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div></div>
+
+  <div class="timeline-entry"><div class="entry-card">
+    <div class="entry-title">POWERCOACH 💪</div>
+    <div class="entry-meta">
+      <div class="entry-location">La Jolla / Irvine, CA</div>
+      <div class="entry-date">August 2024 – January 2026</div>
+    </div>
+    <div class="entry-role">Founding Engineer</div>
+    <div class="entry-body">
+      <div class="entry-description">Building a real-time mobile lifting form correction app to help home gymmers without gym buddies avoid injuries.</div>
+      <ul class="entry-responsibilities">
+        <li>Engineered a PyTorch neural network using sliding-window inputs
+          to find form errors in phone footage of 10 powerlifting exercises</li>
+        <li>Built a data pipeline to convert 10 hours of powerlifting meet footage 
+          into 25,000+ tabular, frame-level data points for form fault detection training</li>
+        <li>Delivered low-latency audiovisual feedback to the React frontend through JPEG compression and payload minimization</li>
+      </ul>
+      <a class="entry-view-link" href="https://apps.apple.com/us/app/pwrcch/id6751323312">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
   </div></div>
 
@@ -1090,7 +1092,7 @@
     </div>
   </div></div>
 
-  <div class="timeline-entry"><div class="entry-card">
+  <!-- <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">X-Ray Tuberculosis Detector</div>
     <div class="entry-meta">
       <div class="entry-location">Irvine, CA</div>
@@ -1106,7 +1108,7 @@
       </ul>
       <a class="entry-view-link" href="https://www.kaggle.com/code/brianjing/tuberculosis-x-ray-diagnosis-cnn-classifier">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
-  </div></div>
+  </div></div> -->
 
   <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">Ignited Minds Nonprofit</div>
@@ -1126,7 +1128,7 @@
       <a class="entry-view-link" href="https://ignitedmindsusa.org/">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
   </div></div>
-
+<!-- 
   <div class="timeline-entry"><div class="entry-card">
     <div class="entry-title">UC Irvine ICS Summer Academy</div>
     <div class="entry-meta">
@@ -1142,7 +1144,7 @@
       </ul>
       <a class="entry-view-link" href="https://www.kaggle.com/code/brianjing/alzheimer-s-detection-model-using-r">View<span class="entry-view-link-arrow" aria-hidden="true">→</span></a>
     </div>
-  </div></div>
+  </div></div> -->
 
   <div class="timeline-tail-spacer" aria-hidden="true"></div>
 </section>
