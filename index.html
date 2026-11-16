@@ -60,56 +60,125 @@
       background-color: var(--water-abyss);
     }
 
-    /* CSS ID (element name tag) selector (#) */
-    #navbar {
+    /* Cloud-shaped hamburger, fixed top-left; opens the #site-menu popover */
+    .menu-toggle {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      top: clamp(22px, 4dvh, 40px);
+      left: clamp(14px, 2.5vw, 36px);
       z-index: 100;
-      display: flex;
-      justify-content: center;
-      gap: 2vw;
-      padding: clamp(12px, 4dvh, 48px) clamp(16px, 10vw, 120px) 0;
-      pointer-events: none;
-    }
-
-    /* CSS class selector (.) */
-    .cloud-link {
-      pointer-events: all;
-      text-decoration: none;
-      font-family: 'DM Sans', sans-serif;
-      font-size: clamp(0.5rem, 0.5rem + 1vw, 1rem);
-      font-weight: 500;
-      line-height: 2;
-      color: #1e3d52;
+      width: 60px;
+      height: 44px;
+      border: 0;
+      border-radius: 999px;
       background: var(--cloud);
-      border-radius: clamp(26px, 4.8vw, 56px);
-      min-height: clamp(28px, 4.2vw, 44px);
-      padding: 0 clamp(14px, 2.3vw, 28px) clamp(4px, 0.55vw, 7px);
-      position: relative;
+      cursor: pointer;
       isolation: isolate;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      display: grid;
+      place-items: center;
       transition: background 0.2s, transform 0.15s;
       box-shadow: 0 3px 12px rgba(80,140,190,0.22), inset 0 1px 0 rgba(255,255,255,0.6);
     }
-    .cloud-link::before, .cloud-link::after {
+    .menu-toggle::before, .menu-toggle::after {
       content: '';
       position: absolute;
-      z-index: 0;
+      z-index: -1;
       background: var(--cloud);
       border-radius: 50%;
       transition: background 0.2s;
     }
-
-    .cloud-link-label {
-      position: relative;
-      z-index: 1;
+    .menu-toggle::before { width: 54%; height: 74%; top: -35%; left: 13%; }
+    .menu-toggle::after  { width: 38%; height: 58%; top: -27%; left: 49%; }
+    .menu-toggle:hover { background: #b8d4e8; transform: translateY(-1px); }
+    .menu-toggle:hover::before, .menu-toggle:hover::after { background: #b8d4e8; }
+    .menu-toggle:focus-visible {
+      outline: 2px solid #0c2030;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 6px rgba(255,255,255,0.9);
     }
-    .cloud-link::before { width: 54%; height: 74%; top: -35%; left: 13%; }
-    .cloud-link::after  { width: 38%; height: 58%; top: -27%; left: 49%; }
-    .cloud-link:hover { background: #b8d4e8; transform: translateY(-1px); }
-    .cloud-link:hover::before, .cloud-link:hover::after { background: #b8d4e8; }
+    .menu-bars { display: grid; gap: 4px; width: 20px; }
+    .menu-bars span {
+      height: 2px;
+      border-radius: 2px;
+      background: #1e3d52;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s;
+    }
+    body:has(#site-menu:popover-open) .menu-bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    body:has(#site-menu:popover-open) .menu-bars span:nth-child(2) { opacity: 0; }
+    body:has(#site-menu:popover-open) .menu-bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    #site-menu {
+      position: fixed;
+      inset: auto;
+      top: calc(clamp(22px, 4dvh, 40px) + 54px);
+      left: clamp(14px, 2.5vw, 36px);
+      margin: 0;
+      border: 0;
+      padding: 8px;
+      min-width: 176px;
+      border-radius: 22px;
+      background: var(--cloud);
+      box-shadow: 0 12px 32px rgba(13,44,67,0.3), inset 0 1px 0 rgba(255,255,255,0.6);
+      opacity: 0;
+      transform: translateY(-6px) scale(0.97);
+      transform-origin: top left;
+      transition: opacity 0.18s, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                  display 0.22s allow-discrete, overlay 0.22s allow-discrete;
+    }
+    #site-menu:popover-open { opacity: 1; transform: none; }
+    @starting-style {
+      #site-menu:popover-open { opacity: 0; transform: translateY(-6px) scale(0.97); }
+    }
+    #site-menu a {
+      display: block;
+      padding: 11px 16px;
+      border-radius: 14px;
+      color: #1e3d52;
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    #site-menu a:hover, #site-menu a:focus-visible { background: #b8d4e8; outline: none; }
+
+    /* Decorative clouds across the top of the hero sky (same pill + two bumps as the menu cloud) */
+    .sky-clouds {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .sky-cloud {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: calc(var(--s) * clamp(72px, 11vw, 150px));
+      aspect-ratio: 10 / 3;
+      border-radius: 999px;
+      background: var(--cloud);
+      opacity: var(--o);
+      box-shadow: 0 3px 12px rgba(80,140,190,0.22), inset 0 1px 0 rgba(255,255,255,0.6);
+      animation: cloud-drift var(--d) ease-in-out infinite alternate;
+    }
+    .sky-cloud::before, .sky-cloud::after {
+      content: '';
+      position: absolute;
+      background: var(--cloud);
+      border-radius: 50%;
+    }
+    .sky-cloud::before { width: 52%; height: 120%; top: -62%; left: 14%; }
+    .sky-cloud::after  { width: 36%; height: 90%;  top: -42%; left: 50%; }
+    @keyframes cloud-drift {
+      from { transform: translateX(-2.5vw); }
+      to   { transform: translateX(2.5vw); }
+    }
+    /* On phones the intro text starts high: drop the two low edge clouds that would sit behind it */
+    @media (max-width: 640px) {
+      .sky-cloud:first-child, .sky-cloud:last-child { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .sky-cloud { animation: none; }
+      .menu-toggle, .menu-bars span, #site-menu { transition: none; }
+    }
 
     #hero {
       position: relative;
@@ -300,38 +369,42 @@
       z-index: 6;
     }
 
+    /* Fills the sky (hero top down to the waterline). The 1fr / auto / 1fr rows put the
+       name dead centre of the sky; the intro sits in the space between it and the water. */
     #hero-text {
       position: absolute;
-      top: 40%;
+      top: 0;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
+      height: 75%;
+      width: min(660px, 88vw);
+      display: grid;
+      grid-template-rows: 1fr auto 1fr;
+      justify-items: center;
       text-align: center;
-      width: min(620px, 82vw);
       color: var(--text-sky);
       z-index: 30;
     }
     #hero-text h1 {
+      grid-row: 2;
       font-family: 'Manrope', sans-serif;
-      font-size: clamp(2.4rem, 5.5vw, 3.4rem);
+      font-size: clamp(3.4rem, 10vw, 6rem);
       font-weight: 780;
       color: #0c2030;
-      margin-bottom: 18px;
-      letter-spacing: -0.022em;
-      line-height: 1.08;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      white-space: nowrap;
     }
     #hero-text p {
-      font-size: clamp(0.9rem, 1.6vw, 1.02rem);
+      grid-row: 3;
+      align-self: start;
+      margin-top: clamp(14px, 2.6dvh, 28px);
+      max-width: 58ch;
+      font-size: clamp(0.95rem, 1.5vw, 1.08rem);
       color: #1a3850;
-      line-height: 1.82;
+      line-height: 1.7;
       font-weight: 400;
-    }
-    #hero-text em { font-style: normal; font-weight: 700; color: #0c2030; }
-    .scroll-cue {
-      margin-top: 20px;
-      font-size: 0.83rem;
-      letter-spacing: 0.06em;
-      color: #26506a;
-      font-weight: 500;
+      text-wrap: pretty;
     }
 
     #submarine {
@@ -475,6 +548,16 @@
       8%   { opacity:0.5; }
       92%  { opacity:0.15; }
       100% { transform:translateY(-700px); opacity:0;   }
+    }
+
+    /* Scroll-driven bubbles (sub exhaust + ambient), drawn in JS. Shares the sub's z-index. */
+    #scroll-bubbles {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
     }
 
     .timeline-line {
@@ -722,8 +805,6 @@
     
     /* CSS media style applications for devices under certain widths: */
     @media (max-width: 900px) {
-      #navbar { gap: 10px; padding-top: 12px; flex-wrap: wrap; }
-      #hero-text { width: min(700px, 88vw); top: 36%; }
       .entry-card {
         column-gap: 16px;
       }
@@ -751,8 +832,7 @@
       .entry-card {
         padding: 16px 18px;
       }
-      #hero-text h1 { font-size: clamp(2rem, 8vw, 3rem); }
-      #hero-text p { font-size: 0.94rem; }
+      #hero-text h1 { font-size: clamp(2.6rem, 13vw, 3.4rem); }
       .floor-contact {
         flex-direction: column;
         gap: 8px;
@@ -791,18 +871,28 @@
 </head>
 <body>
 
-<nav id="navbar">
-  <a class="cloud-link" href="https://www.linkedin.com/in/brian-jing/" target="_blank" rel="noopener noreferrer"><span class="cloud-link-label">LinkedIn</span></a>
-  <a class="cloud-link" href="https://drive.google.com/file/d/14Pf7hKEumm19a6dJDMozZYT2yxXJGJ6Y/view?usp=sharing" target="_blank" rel="noopener noreferrer"><span class="cloud-link-label">Resume</span></a>
-  <a class="cloud-link" href="https://github.com/brianjjing" target="_blank" rel="noopener noreferrer"><span class="cloud-link-label">GitHub</span></a>
-  <a class="cloud-link" href="https://www.kaggle.com/brianjing" target="_blank" rel="noopener noreferrer"><span class="cloud-link-label">Kaggle</span></a>
-  <a class="cloud-link" href="mailto:bjing@ucsd.edu" target="_blank" rel="noopener noreferrer"><span class="cloud-link-label">Contact</span></a>
+<button class="menu-toggle" type="button" popovertarget="site-menu" aria-label="Links menu">
+  <span class="menu-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+</button>
+<nav id="site-menu" popover aria-label="Links">
+  <a href="https://www.linkedin.com/in/brian-jing/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  <a href="https://github.com/brianjjing" target="_blank" rel="noopener noreferrer">GitHub</a>
+  <a href="mailto:bjing@ucsd.edu">Contact</a>
 </nav>
 
 <section id="hero">
   <div class="sky-layer"></div>
   <div class="hero-water-matte" aria-hidden="true"></div>
   <div class="horizon-haze"></div>
+  <div class="sky-clouds" aria-hidden="true">
+    <span class="sky-cloud" style="--x:-4%; --y:30%; --s:1.05; --o:0.7; --d:46s;"></span>
+    <span class="sky-cloud" style="--x:9%;  --y:11%; --s:1.3;  --o:0.95; --d:58s;"></span>
+    <span class="sky-cloud" style="--x:27%; --y:5%;  --s:0.7;  --o:0.65; --d:39s;"></span>
+    <span class="sky-cloud" style="--x:42%; --y:9%;  --s:1.1;  --o:0.85; --d:52s;"></span>
+    <span class="sky-cloud" style="--x:60%; --y:4%;  --s:0.8;  --o:0.7;  --d:43s;"></span>
+    <span class="sky-cloud" style="--x:74%; --y:13%; --s:1.45; --o:0.95; --d:64s;"></span>
+    <span class="sky-cloud" style="--x:91%; --y:27%; --s:0.95; --o:0.7;  --d:49s;"></span>
+  </div>
 
   <div class="back-wave-wrap" id="back-wave-wrap" aria-hidden="true">
     <svg class="wave-svg" viewBox="0 0 1200 180" preserveAspectRatio="none">
@@ -834,14 +924,8 @@
   <div id="hero-text">
     <h1>Brian Jing</h1>
     <p>
-      Hi! I'm a second-year <em>aspiring AI Engineer & DS major @ UCSD</em>.<br/>
-      I build AI products to make life easier for all sorts of people, from gym rats to architects.
-      Currently, I'm building <em>Site Planner</em>, an editable site plan generator for architects based on natural language,
-      helping them avoid the time-consuming back-and-forth of designing a rough draft. 
-      I also do AI research! I'm currently an <em>ML Research Intern</em> in UCSD Prof. Rose Yu's Spatiotemporal ML Lab,
-      working on a clinical offline reinforcement learning algorithm called GORMPO.
+      Started my tech journey in MedTech building disease classification pipelines. Now pursuing AI & SWE, but I'm still focused on building human-centered systems in high-stakes domains. AI-savvy in research, enterprise, and startup settings. 2x hackathon winner - great performer under pressure.
     </p>
-    <p class="scroll-cue">Curious about my experience & projects? Scroll down to dive in ↓</p>
   </div>
 
   <div class="front-wave-wrap" id="front-wave-wrap" aria-hidden="true">
@@ -936,6 +1020,8 @@
     </g>
   </svg>
 </div>
+
+<canvas id="scroll-bubbles" aria-hidden="true"></canvas>
 
 <section id="timeline-section">
   <div class="water-bg"></div>
@@ -1236,6 +1322,139 @@
     // Hero: keep sub behind the front surface wave (front-wave-wrap z-index: 60).
     // Past hero: sub (z-index: 2) above #ocean-floor deep band, below timeline entries (z-index: 3).
     sub.style.zIndex = inHeroPhase ? '8' : '2';
+    bubbleCanvas.style.zIndex = sub.style.zIndex;
+  }
+
+  /*
+    Scroll bubbles: scroll speed (either direction) drives a jet from the sub's periscope
+    plus a light scatter across the viewport. Faster scroll = more, bigger, faster bubbles.
+    Skipped entirely under prefers-reduced-motion.
+  */
+  const bubbleCanvas = document.getElementById('scroll-bubbles');
+  const bubbleCtx = bubbleCanvas.getContext('2d');
+  const BUBBLE_FULL_SPEED = 2600; // px/s of scroll that counts as full power
+  const BUBBLE_MAX = 420;
+  const scrollBubbles = [];
+  let bubbleDpr = 1;
+  let bubbleLastMs = 0;
+  let bubbleLastSy = window.scrollY;
+  let scrollSpeed = 0;   // smoothed px/s, signed
+  let jetDebt = 0;       // fractional particles owed
+  let ambientDebt = 0;
+  let bubbleCanvasDirty = false;
+  let lastHoleY = null;
+
+  function sizeBubbleCanvas() {
+    bubbleDpr = Math.min(window.devicePixelRatio || 1, 2);
+    bubbleCanvas.width = Math.round(window.innerWidth * bubbleDpr);
+    bubbleCanvas.height = Math.round(window.innerHeight * bubbleDpr);
+  }
+  sizeBubbleCanvas();
+  window.addEventListener('resize', sizeBubbleCanvas);
+
+  function updateScrollBubbles(nowMs, sy) {
+    if (prefersReducedMotion) return;
+    const dt = Math.min((nowMs - bubbleLastMs) / 1000, 0.05);
+    bubbleLastMs = nowMs;
+    if (dt <= 0) return;
+
+    const dy = sy - bubbleLastSy;
+    bubbleLastSy = sy;
+    scrollSpeed += (dy / dt - scrollSpeed) * 0.2;
+    const power = clamp01(Math.abs(scrollSpeed) / BUBBLE_FULL_SPEED);
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    /* Waterline on screen: bubbles only exist below it, and pop when they reach it. */
+    const surfaceY = hero.getBoundingClientRect().top + hero.offsetHeight * 0.8 + 6;
+    const subR = sub.getBoundingClientRect();
+    const unit = Math.max(0.6, subR.width / 170); // scale with the sub (it is vw-sized)
+    /* Top of the periscope in the sub's 180x96 viewBox */
+    const holeX = subR.left + subR.width * (79 / 180);
+    const holeY = subR.top + subR.height * (10 / 96);
+
+    /* The sub climbs the screen on a scroll up; carry its jet with it so the stream stays overhead. */
+    const holeRise = lastHoleY !== null && Math.abs(holeY - lastHoleY) < 60 ? Math.min(0, holeY - lastHoleY) : 0;
+    lastHoleY = holeY;
+
+    if (holeY > surfaceY + 4) {
+      /* Idle trickle so the sub always breathes; ramps to a jet with scroll speed. */
+      jetDebt += dt * lerp(0.9, 150, power * power);
+      while (jetDebt >= 1 && scrollBubbles.length < BUBBLE_MAX) {
+        jetDebt -= 1;
+        scrollBubbles.push({
+          x: holeX + (Math.random() - 0.5) * 6 * unit,
+          y: holeY,
+          vx: (Math.random() - 0.5) * lerp(24, 150, power) - 26 * power,
+          vy: -lerp(34, 560, power) * (0.55 + Math.random() * 0.45),
+          r: (lerp(1.4, 2.6, power) + Math.random() * Math.random() * lerp(2.2, 10, power)) * unit,
+          age: 0,
+          life: 1.5 + Math.random() * lerp(1.2, 2.4, power),
+          phase: Math.random() * 6.28,
+          follow: 0.3, // how much of a downward scroll drags it up the screen
+        });
+      }
+    }
+    jetDebt = Math.min(jetDebt, 1);
+
+    const waterTop = Math.max(0, surfaceY + 12);
+    if (waterTop < vh - 40) {
+      ambientDebt += dt * power * 30;
+      while (ambientDebt >= 1 && scrollBubbles.length < BUBBLE_MAX) {
+        ambientDebt -= 1;
+        scrollBubbles.push({
+          x: Math.random() * vw,
+          y: lerp(waterTop, vh, Math.random()),
+          vx: (Math.random() - 0.5) * 16,
+          vy: -(18 + Math.random() * 46),
+          r: 1 + Math.random() * lerp(1.6, 4.2, power),
+          age: 0,
+          life: 1.2 + Math.random() * 1.8,
+          phase: Math.random() * 6.28,
+          follow: 0.45 + Math.random() * 0.4, // drifts with the water as the page moves
+          ambient: true,
+        });
+      }
+    }
+    ambientDebt = Math.min(ambientDebt, 1);
+
+    if (!scrollBubbles.length && !bubbleCanvasDirty) return;
+    bubbleCtx.setTransform(bubbleDpr, 0, 0, bubbleDpr, 0, 0);
+    bubbleCtx.clearRect(0, 0, vw, vh);
+    bubbleCanvasDirty = scrollBubbles.length > 0;
+
+    const drag = Math.exp(-dt * 2.2);
+    for (let i = scrollBubbles.length - 1; i >= 0; i--) {
+      const b = scrollBubbles[i];
+      b.age += dt;
+      /* Jet momentum bleeds off into a buoyant rise; bigger bubbles rise faster. */
+      const riseVy = -(26 + b.r * 7);
+      b.vy = riseVy + (b.vy - riseVy) * drag;
+      b.vx *= drag;
+      b.x += (b.vx + Math.sin(b.age * 5.2 + b.phase) * (8 + b.r * 1.6)) * dt;
+      b.y += b.vy * dt - (b.ambient ? dy * b.follow : Math.max(0, dy) * b.follow - holeRise);
+
+      if (b.age >= b.life || b.y - b.r < surfaceY || b.y < -30 || b.y > vh + 30) {
+        scrollBubbles.splice(i, 1);
+        continue;
+      }
+      const u = b.age / b.life;
+      const alpha = Math.min(1, b.age / 0.12) * (u > 0.65 ? (1 - u) / 0.35 : 1) * (b.ambient ? 0.6 : 1);
+      const r = b.r * (0.6 + 0.4 * Math.min(1, b.age / 0.25));
+      bubbleCtx.beginPath();
+      bubbleCtx.arc(b.x, b.y, r, 0, 6.2832);
+      bubbleCtx.fillStyle = `rgba(160,215,245,${0.16 * alpha})`;
+      bubbleCtx.fill();
+      bubbleCtx.lineWidth = 1;
+      bubbleCtx.strokeStyle = `rgba(214,240,255,${0.62 * alpha})`;
+      bubbleCtx.stroke();
+      if (r > 2.4) {
+        bubbleCtx.beginPath();
+        bubbleCtx.arc(b.x - r * 0.36, b.y - r * 0.38, r * 0.2, 0, 6.2832);
+        bubbleCtx.fillStyle = `rgba(255,255,255,${0.75 * alpha})`;
+        bubbleCtx.fill();
+      }
+    }
   }
 
   function animateOcean(nowMs) {
@@ -1398,6 +1617,7 @@
       }
     }
 
+    updateScrollBubbles(nowMs, syNow);
     requestAnimationFrame(animateOcean);
   }
 
