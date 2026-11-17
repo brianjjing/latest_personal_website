@@ -156,7 +156,7 @@
     }
     /* On phones the intro text starts high: drop the two low edge clouds that would sit behind it */
     @media (max-width: 640px) {
-      .sky-cloud:first-child, .sky-cloud:last-child { display: none; }
+      .sky-cloud:first-child, .sky-cloud:last-child, .sky-cloud.side { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
       .sky-cloud { animation: none; }
@@ -380,7 +380,7 @@
       line-height: 1;
       white-space: nowrap;
     }
-    #hero-text p {
+    #hero-text p { max-width: 41em;
       grid-row: 3;
       align-self: end;
       margin: 16px 0 clamp(18px, 4dvh, 44px);
@@ -428,36 +428,12 @@
       animation: bounce 2.8s ease-in-out infinite;
     }
     #scroll-arrow span {
-      font-size: 0.68rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
       color: rgba(255,255,255,0.98);
       font-weight: 500;
     }
-    .chev {
-      width: 28px;
-      height: 15px;
-      position: relative;
-    }
-    .chev::before, .chev::after {
-      content: '';
-      position: absolute;
-      width: 15px;
-      height: 2px;
-      top: 7px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 999px;
-    }
-    .chev::before {
-      left: 1px;
-      transform: rotate(32deg);
-      transform-origin: right center;
-    }
-    .chev::after {
-      right: 1px;
-      transform: rotate(-32deg);
-      transform-origin: left center;
-    }
+    .chev { width: 20px; height: 8px; display: block; overflow: visible; }
     @keyframes bounce {
       0%,100% { transform: translateX(-50%) translateY(0); }
       55% { transform: translateX(-50%) translateY(9px); }
@@ -861,7 +837,7 @@
 <nav id="site-menu" popover aria-label="Links">
   <a href="https://www.linkedin.com/in/brian-jing/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
   <a href="https://github.com/brianjjing" target="_blank" rel="noopener noreferrer">GitHub</a>
-  <a href="mailto:bjing@ucsd.edu">Contact</a>
+  <a href="mailto:brianjing1@gmail.com">Contact</a>
 </nav>
 
 <section id="hero">
@@ -875,6 +851,12 @@
     <span class="sky-cloud" style="--x:42%; --y:9%;  --s:1.1;  --o:0.85; --d:52s;"></span>
     <span class="sky-cloud" style="--x:60%; --y:4%;  --s:0.8;  --o:0.7;  --d:43s;"></span>
     <span class="sky-cloud" style="--x:74%; --y:13%; --s:1.45; --o:0.95; --d:64s;"></span>
+    <span class="sky-cloud" style="--x:19%; --y:25%; --s:0.6;  --o:0.55; --d:41s;"></span>
+    <span class="sky-cloud" style="--x:51%; --y:21%; --s:0.5;  --o:0.5;  --d:36s;"></span>
+    <span class="sky-cloud" style="--x:79%; --y:33%; --s:0.6;  --o:0.55; --d:44s;"></span>
+    <span class="sky-cloud side" style="--x:3%;  --y:52%; --s:0.85; --o:0.6;  --d:55s;"></span>
+    <span class="sky-cloud side" style="--x:13%; --y:40%; --s:0.5;  --o:0.5;  --d:38s;"></span>
+    <span class="sky-cloud side" style="--x:85%; --y:50%; --s:1.0;  --o:0.65; --d:60s;"></span>
     <span class="sky-cloud" style="--x:91%; --y:27%; --s:0.95; --o:0.7;  --d:49s;"></span>
   </div>
 
@@ -930,8 +912,8 @@
   </div>
 
   <div id="scroll-arrow" onclick="document.getElementById('timeline-section').scrollIntoView({behavior:'smooth'})">
-    <!-- <span>Dive in</span> -->
-    <div class="chev"></div>
+    <span>Experience</span>
+    <svg class="chev" viewBox="0 0 20 8" aria-hidden="true"><polyline points="1,1 10,7 19,1" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
 </section>
 
@@ -1136,7 +1118,7 @@
     </div>
     <div class="entry-role">Founding Engineer</div>
     <div class="entry-body">
-      <div class="entry-description">Building a real-time mobile lifting form correction app to help home gymmers without gym buddies avoid injuries.</div>
+      <div class="entry-description">Real-time mobile powerlifting form correction app; helping home gymmers avoid injuries.</div>
       <ul class="entry-responsibilities">
         <li>Created a 15K-image COCO dataset for training a MobileNetV2 barbell object detection, by building a data pipeline for
           scraping and labeling frames from raw powerlifting meet footage</li>
@@ -1155,7 +1137,7 @@
     </div>
     <div class="entry-role">Data Science Lead</div>
     <div class="entry-body">
-      <div class="entry-description">Cofounded a nonprofit providing Malawian high schools with specialized STEM education.</div>
+      <div class="entry-description">Nonprofit providing Malawian high schools with specialized STEM education.</div>
       <ul class="entry-responsibilities">
         <li>Designed and taught the first data science curriculum for 11 Malawian high schools remotely</li>
         <li>Enhanced teaching methods based on participation metrics, fostering engaging learning
