@@ -60,41 +60,25 @@
       background-color: var(--water-abyss);
     }
 
-    /* Cloud-shaped hamburger, fixed top-left; opens the #site-menu popover */
+    /* Hamburger, fixed top-left; opens the #site-menu popover. Same colour as the clouds. */
     .menu-toggle {
       position: fixed;
-      top: clamp(22px, 4dvh, 40px);
-      left: clamp(14px, 2.5vw, 36px);
+      top: clamp(14px, 3dvh, 28px);
+      left: clamp(14px, 2.5vw, 32px);
       z-index: 100;
-      width: 60px;
+      width: 44px;
       height: 44px;
       border: 0;
-      border-radius: 999px;
+      border-radius: 4px;
       background: var(--cloud);
+      box-shadow: 0 3px 12px rgba(80,140,190,0.22);
       cursor: pointer;
-      isolation: isolate;
       display: grid;
       place-items: center;
-      transition: background 0.2s, transform 0.15s;
-      box-shadow: 0 3px 12px rgba(80,140,190,0.22), inset 0 1px 0 rgba(255,255,255,0.6);
-    }
-    .menu-toggle::before, .menu-toggle::after {
-      content: '';
-      position: absolute;
-      z-index: -1;
-      background: var(--cloud);
-      border-radius: 50%;
       transition: background 0.2s;
     }
-    .menu-toggle::before { width: 54%; height: 74%; top: -35%; left: 13%; }
-    .menu-toggle::after  { width: 38%; height: 58%; top: -27%; left: 49%; }
-    .menu-toggle:hover { background: #b8d4e8; transform: translateY(-1px); }
-    .menu-toggle:hover::before, .menu-toggle:hover::after { background: #b8d4e8; }
-    .menu-toggle:focus-visible {
-      outline: 2px solid #0c2030;
-      outline-offset: 2px;
-      box-shadow: 0 0 0 6px rgba(255,255,255,0.9);
-    }
+    .menu-toggle:hover { background: #b8d4e8; }
+    .menu-toggle:focus-visible { outline: 2px solid #0c2030; outline-offset: 2px; box-shadow: 0 0 0 6px rgba(255,255,255,0.9); }
     .menu-bars { display: grid; gap: 4px; width: 20px; }
     .menu-bars span {
       height: 2px;
@@ -109,29 +93,28 @@
     #site-menu {
       position: fixed;
       inset: auto;
-      top: calc(clamp(22px, 4dvh, 40px) + 54px);
-      left: clamp(14px, 2.5vw, 36px);
+      top: calc(clamp(14px, 3dvh, 28px) + 52px);
+      left: clamp(14px, 2.5vw, 32px);
       margin: 0;
       border: 0;
-      padding: 8px;
-      min-width: 176px;
-      border-radius: 22px;
+      padding: 6px;
+      min-width: 168px;
+      border-radius: 4px;
       background: var(--cloud);
-      box-shadow: 0 12px 32px rgba(13,44,67,0.3), inset 0 1px 0 rgba(255,255,255,0.6);
+      box-shadow: 0 12px 32px rgba(13,44,67,0.3);
       opacity: 0;
-      transform: translateY(-6px) scale(0.97);
-      transform-origin: top left;
+      transform: translateY(-6px);
       transition: opacity 0.18s, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
                   display 0.22s allow-discrete, overlay 0.22s allow-discrete;
     }
     #site-menu:popover-open { opacity: 1; transform: none; }
     @starting-style {
-      #site-menu:popover-open { opacity: 0; transform: translateY(-6px) scale(0.97); }
+      #site-menu:popover-open { opacity: 0; transform: translateY(-6px); }
     }
     #site-menu a {
       display: block;
-      padding: 11px 16px;
-      border-radius: 14px;
+      padding: 11px 14px;
+      border-radius: 3px;
       color: #1e3d52;
       font-weight: 500;
       font-size: 0.95rem;
@@ -140,7 +123,7 @@
     }
     #site-menu a:hover, #site-menu a:focus-visible { background: #b8d4e8; outline: none; }
 
-    /* Decorative clouds across the top of the hero sky (same pill + two bumps as the menu cloud) */
+    /* Decorative clouds across the top of the hero sky (pill + two bumps) */
     .sky-clouds {
       position: absolute;
       inset: 0;
@@ -188,6 +171,8 @@
       height: 100dvh;
       overflow: hidden;
       isolation: isolate;
+      /* Above #timeline-section, whose .water-bg overlaps the hero's bottom 28px and would cover the scroll arrow */
+      z-index: 1;
     }
 
     .sky-layer {
@@ -237,7 +222,7 @@
 
     .horizon-haze {
       position: absolute;
-      bottom: 20%;
+      bottom: 12.5%;
       left: 0; right: 0;
       height: 56px;
       background: linear-gradient(180deg, transparent, rgba(120,190,225,0.55));
@@ -250,7 +235,7 @@
       left: 0;
       right: 0;
       bottom: -8px;
-      height: calc(30% + 20px);
+      height: calc(22.5% + 20px);
       /* One ramp: hero sky / shallow water → bridge → surface → ocean (--water-top) */
       background: linear-gradient(180deg,
         transparent 0%,
@@ -272,7 +257,7 @@
     }
 
     .back-wave-wrap {
-      bottom: 16.8%;
+      bottom: 9.3%;
       height: 14vh;
       z-index: 5;
       opacity: 0.92;
@@ -280,7 +265,7 @@
     }
 
     .front-wave-wrap {
-      bottom: 12.2%;
+      bottom: 4.7%;
       height: 19vh;
       z-index: 60;
       opacity: 0.995;
@@ -334,9 +319,9 @@
       transform-origin: center;
       z-index: 4;
     }
-    .ws1 { bottom: 20%; background: #3a9abe; opacity: 0.95; }
-    .ws2 { bottom: 19%; background: #2a82a4; opacity: 0.65; }
-    .ws3 { bottom: 18%; background: #1e6a8c; opacity: 0.4;  }
+    .ws1 { bottom: 12.5%; background: #3a9abe; opacity: 0.95; }
+    .ws2 { bottom: 11.5%; background: #2a82a4; opacity: 0.65; }
+    .ws3 { bottom: 10.5%; background: #1e6a8c; opacity: 0.4;  }
 
     .foam-line {
       position: absolute;
@@ -369,17 +354,17 @@
       z-index: 6;
     }
 
-    /* Fills the sky (hero top down to the waterline). The 1fr / auto / 1fr rows put the
-       name dead centre of the sky; the intro sits in the space between it and the water. */
+    /* Fills the sky (hero top down to the waterline). The rows put the name just below the
+       sky's centre; the intro is bottom-aligned in the space between it and the water. */
     #hero-text {
       position: absolute;
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      height: 75%;
-      width: min(660px, 88vw);
+      height: 82.5%;
+      width: min(860px, 90vw);
       display: grid;
-      grid-template-rows: 1fr auto 1fr;
+      grid-template-rows: 1.25fr auto 1fr;
       justify-items: center;
       text-align: center;
       color: var(--text-sky);
@@ -388,7 +373,7 @@
     #hero-text h1 {
       grid-row: 2;
       font-family: 'Manrope', sans-serif;
-      font-size: clamp(3.4rem, 10vw, 6rem);
+      font-size: clamp(3.4rem, 11.5vw, 7.25rem);
       font-weight: 780;
       color: #0c2030;
       letter-spacing: -0.03em;
@@ -397,10 +382,9 @@
     }
     #hero-text p {
       grid-row: 3;
-      align-self: start;
-      margin-top: clamp(14px, 2.6dvh, 28px);
-      max-width: 58ch;
-      font-size: clamp(0.95rem, 1.5vw, 1.08rem);
+      align-self: end;
+      margin: 16px 0 clamp(18px, 4dvh, 44px);
+      font-size: clamp(0.9rem, 1.35vw, 1rem);
       color: #1a3850;
       line-height: 1.7;
       font-weight: 400;
@@ -431,7 +415,7 @@
 
     #scroll-arrow {
       position: absolute;
-      bottom: 9%;
+      bottom: 3.5%;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -832,7 +816,7 @@
       .entry-card {
         padding: 16px 18px;
       }
-      #hero-text h1 { font-size: clamp(2.6rem, 13vw, 3.4rem); }
+      #hero-text h1 { font-size: clamp(3rem, 15vw, 4rem); }
       .floor-contact {
         flex-direction: column;
         gap: 8px;
@@ -906,20 +890,20 @@
   <div class="wave-seam ws2"></div>
   <div class="wave-seam ws3"></div>
 
-  <div class="shimmer" style="width:80px; left:10%; bottom:11%;"></div>
-  <div class="shimmer" style="width:55px; left:28%; bottom:8%;"></div>
-  <div class="shimmer" style="width:95px; left:52%; bottom:13%;"></div>
-  <div class="shimmer" style="width:65px; left:70%; bottom:9%;"></div>
-  <div class="shimmer" style="width:45px; left:86%; bottom:11%;"></div>
+  <div class="shimmer" style="width:80px; left:10%; bottom:3.5%;"></div>
+  <div class="shimmer" style="width:55px; left:28%; bottom:0.5%;"></div>
+  <div class="shimmer" style="width:95px; left:52%; bottom:5.5%;"></div>
+  <div class="shimmer" style="width:65px; left:70%; bottom:1.5%;"></div>
+  <div class="shimmer" style="width:45px; left:86%; bottom:3.5%;"></div>
 
-  <div class="foam-line" style="left:6%; bottom:16.7%; width:90px; height:4px;"></div>
-  <div class="foam-line" style="left:18%; bottom:15.9%; width:46px; height:3px;"></div>
-  <div class="foam-line" style="left:58%; bottom:16.4%; width:74px; height:4px;"></div>
-  <div class="foam-line" style="left:72%; bottom:15.5%; width:52px; height:3px;"></div>
-  <div class="hero-spray" style="left:13%; bottom:18.5%;"></div>
-  <div class="hero-spray" style="left:16%; bottom:17.6%;"></div>
-  <div class="hero-spray" style="left:63%; bottom:18.3%;"></div>
-  <div class="hero-spray" style="left:67%; bottom:17.8%;"></div>
+  <div class="foam-line" style="left:6%; bottom:9.2%; width:90px; height:4px;"></div>
+  <div class="foam-line" style="left:18%; bottom:8.4%; width:46px; height:3px;"></div>
+  <div class="foam-line" style="left:58%; bottom:8.9%; width:74px; height:4px;"></div>
+  <div class="foam-line" style="left:72%; bottom:8%; width:52px; height:3px;"></div>
+  <div class="hero-spray" style="left:13%; bottom:11%;"></div>
+  <div class="hero-spray" style="left:16%; bottom:10.1%;"></div>
+  <div class="hero-spray" style="left:63%; bottom:10.8%;"></div>
+  <div class="hero-spray" style="left:67%; bottom:10.3%;"></div>
 
   <div id="hero-text">
     <h1>Brian Jing</h1>
@@ -947,8 +931,6 @@
 
   <div id="scroll-arrow" onclick="document.getElementById('timeline-section').scrollIntoView({behavior:'smooth'})">
     <!-- <span>Dive in</span> -->
-    <!-- <div class="chev"></div> -->
-    <div class="chev"></div>
     <div class="chev"></div>
   </div>
 </section>
@@ -1307,7 +1289,7 @@
     return { el, depth, phase: i * 1.1 };
   });
 
-  const waterSurfaceLineFromBottom = 0.20;
+  const waterSurfaceLineFromBottom = 0.125;
   const shimmerLayers = shimmerEls.map((el, i) => {
     const bottomStr = el.style.bottom || '';
     const bottomPct = bottomStr.endsWith('%') ? parseFloat(bottomStr) / 100 : 0.10;
@@ -1366,7 +1348,7 @@
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     /* Waterline on screen: bubbles only exist below it, and pop when they reach it. */
-    const surfaceY = hero.getBoundingClientRect().top + hero.offsetHeight * 0.8 + 6;
+    const surfaceY = hero.getBoundingClientRect().top + hero.offsetHeight * 0.875 + 6;
     const subR = sub.getBoundingClientRect();
     const unit = Math.max(0.6, subR.width / 170); // scale with the sub (it is vw-sized)
     /* Top of the periscope in the sub's 180x96 viewBox */
@@ -1578,7 +1560,7 @@
       const timelineR = timeline.getBoundingClientRect();
       const floorR = oceanFloor.getBoundingClientRect();
 
-      let tStart = heroR.top + heroR.height * 0.80 - subHNow * 0.5;
+      let tStart = heroR.top + heroR.height * 0.875 - subHNow * 0.5;
       // if (heroR.bottom < subHNow + 48) {
       //   tStart = timelineR.top + Math.min(28, Math.max(12, timelineR.height * 0.035));
       // }
@@ -1605,7 +1587,7 @@
       if (syNow <= 0) {
         // Top overscroll: Lock to the exact document coordinate of the water line
         sub.style.position = 'absolute';
-        sub.style.top = (hero.offsetHeight * 0.80 - subHNow * 0.5) + 'px';
+        sub.style.top = (hero.offsetHeight * 0.875 - subHNow * 0.5) + 'px';
       } else if (syNow >= scrollMax) {
         // Bottom overscroll: Lock to the exact document coordinate of the sand
         sub.style.position = 'absolute';
